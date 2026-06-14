@@ -1,26 +1,22 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="version" content="v1.0.10">
-    <title>منصة الملفات - تصميم MediaFire</title>
+    <title>منصة الملفات والمحادثة</title>
     <style>
+        /* الوضع الداكن هو الأساسي الآن */
         :root {
-            --bg-color: #f5f5f7;
-            --text-color: #1d1d1f;
-            --primary: #007aff;
-            --danger: #ff3b30;
-            --panel-bg: rgba(255, 255, 255, 0.7);
+            --bg-color: #000000; --text-color: #f5f5f7; --primary: #0a84ff;
+            --danger: #ff3b30; --panel-bg: rgba(28, 28, 30, 0.7);
             --border-radius: 18px;
             --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        [data-theme="dark"] {
-            --bg-color: #000000;
-            --text-color: #f5f5f7;
-            --panel-bg: rgba(28, 28, 30, 0.7);
-            --primary: #0a84ff;
+        /* الوضع الفاتح عند التبديل */
+        [data-theme="light"] {
+            --bg-color: #f5f5f7; --text-color: #1d1d1f;
+            --panel-bg: rgba(255, 255, 255, 0.7); --primary: #007aff;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-family); }
@@ -31,7 +27,6 @@
             height: 100vh; display: flex; flex-direction: column;
         }
 
-        /* حاجز دوران الشاشة يعمل على الموبايل فقط (شاشات أقل من 768 بيكسل) */
         @media screen and (max-width: 768px) and (orientation: landscape) {
             #orientation-block { display: flex !important; }
         }
@@ -72,80 +67,32 @@
 
         .timestamp { font-size: 11px; opacity: 0.7; margin-top: 8px; text-align: left; direction: ltr; }
 
-        /* تصميم MediaFire */
+        /* MediaFire Design - الوضع الأساسي الداكن */
         .mediafire-card {
-            background: #ffffff;
-            border: 1px solid #d3d9e0;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            gap: 15px;
-            margin-top: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            color: #333;
-            font-family: Arial, sans-serif;
-            min-width: 280px;
-            max-width: 450px;
-            direction: ltr; 
-            text-align: left;
+            background: #242424; border: 1px solid #383838; border-radius: 6px;
+            display: flex; align-items: center; padding: 12px 15px; gap: 15px;
+            margin-top: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            color: #eee; font-family: Arial, sans-serif;
+            min-width: 280px; max-width: 450px; direction: ltr; text-align: left;
         }
 
-        [data-theme="dark"] .mediafire-card {
-            background: #242424;
-            border-color: #383838;
-            color: #eee;
-        }
-
-        .mediafire-icon {
-            font-size: 28px;
-            color: #8fa2b4;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .mediafire-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            overflow: hidden;
-        }
-
-        .mediafire-filename {
-            font-weight: bold;
-            font-size: 14px;
-            color: #1275d8; 
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        [data-theme="dark"] .mediafire-filename { color: #5aa9fa; }
-
-        .mediafire-meta {
-            font-size: 11px;
-            color: #6c757d;
-            font-weight: normal;
-        }
-
+        /* MediaFire Design - الوضع الفاتح */
+        [data-theme="light"] .mediafire-card { background: #ffffff; border-color: #d3d9e0; color: #333; }
+        
+        .mediafire-icon { font-size: 28px; color: #8fa2b4; display: flex; align-items: center; justify-content: center; }
+        .mediafire-info { flex: 1; display: flex; flex-direction: column; gap: 4px; overflow: hidden; }
+        
+        .mediafire-filename { font-weight: bold; font-size: 14px; color: #5aa9fa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        [data-theme="light"] .mediafire-filename { color: #1275d8; }
+        
+        .mediafire-meta { font-size: 11px; color: #6c757d; font-weight: normal; }
+        
         .mediafire-download-btn {
-            background: #118120; 
-            color: #ffffff !important;
-            text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: background 0.2s;
-            cursor: pointer;
-            border: none;
+            background: #118120; color: #ffffff !important; text-decoration: none;
+            padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: bold;
+            display: flex; align-items: center; gap: 5px; transition: background 0.2s;
+            cursor: pointer; border: none;
         }
-
         .mediafire-download-btn:hover { background: #0d6318; }
 
         .input-area {
@@ -167,6 +114,8 @@
 
         .upload-status { font-size: 12px; margin-top: 8px; display: flex; justify-content: space-between; font-weight: bold; }
         .cancel-upload { color: #ffcc00; cursor: pointer; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 10px;}
+        .progress-bar-bg { background: rgba(0,0,0,0.1); border-radius: 5px; height: 5px; width: 100%; margin-top: 5px; overflow: hidden; }
+        .progress-bar-fill { background: #118120; height: 100%; width: 0%; transition: width 0.3s; }
     </style>
 </head>
 <body>
@@ -179,6 +128,7 @@
         <div class="controls">
             <button onclick="toggleDarkMode()">☀️/🌙</button>
             <button onclick="changeTheme()">تغيير الثيم</button>
+            <button onclick="copyShareLink()">مشاركة الرابط 🔗</button>
             <button onclick="document.getElementById('fileInput').click()">📁 تصفح المجلدات</button>
         </div>
         <div class="controls">
@@ -207,40 +157,41 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getDatabase, ref as dbRef, push, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-        import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/+esm';
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBtIkF-UhkeFa-cxutgJAQpR7K_IjKxloc",
-            authDomain: "spygame-337ee.firebaseapp.com",
-            databaseURL: "https://spygame-337ee-default-rtdb.firebaseio.com", 
-            projectId: "spygame-337ee",
-            storageBucket: "spygame-337ee.firebasestorage.app"
-        };
+        const SUPABASE_URL = 'https://pyqnnwtrrwnfitveeetw.supabase.co'; 
+        const SUPABASE_KEY = 'Sb_publishable_rO1xhC-CnqiumB0cRkvvGQ_youWGnKn';
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const storage = getStorage(app);
-        const chatDbRef = dbRef(db, 'messages');
-
+        const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         const notificationSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
         const chatContainer = document.getElementById('chatContainer');
-        
         window.cancelUploadTasks = {};
+
+        // جلب الرسائل القديمة
+        async function fetchMessages() {
+            const { data, error } = await supabase.from('messages').select('*').order('id', { ascending: true });
+            if (data) data.forEach(renderMessage);
+        }
+        fetchMessages();
+
+        // الاستماع المباشر (Realtime)
+        supabase.channel('public:messages')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+                renderMessage(payload.new);
+            })
+            .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'messages' }, payload => {
+                chatContainer.innerHTML = ''; 
+                fetchMessages(); 
+            })
+            .subscribe();
 
         window.sendMessage = async () => {
             const input = document.getElementById('messageInput');
             if (input.value.trim() === '') return;
             
-            const msgData = {
-                type: 'text',
-                text: input.value,
-                time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
-            };
-            
+            const timeStr = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+            await supabase.from('messages').insert([{ type: 'text', text: input.value, time: timeStr }]);
             input.value = '';
-            await push(chatDbRef, msgData);
             notificationSound.play().catch(e => {});
         };
 
@@ -250,6 +201,7 @@
             if (!file) return;
 
             const fileId = 'file_' + Date.now();
+            const filePath = Date.now() + "_" + encodeURIComponent(file.name);
             const fileSizeFormatted = formatBytes(file.size);
             
             const uploadDiv = document.createElement('div');
@@ -264,6 +216,7 @@
                             <div class="mediafire-meta">${fileSizeFormatted} - Uploading...</div>
                         </div>
                     </div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-${fileId}"></div></div>
                     <div class="upload-status">
                         <span id="status-${fileId}">0% (محاولة 1)</span>
                         <span class="cancel-upload" onclick="cancelUploadTasks['${fileId}']()">إلغاء ✖</span>
@@ -273,52 +226,48 @@
             chatContainer.appendChild(uploadDiv);
             chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
 
-            let maxAttempts = 100;
-            let success = false;
             let isCanceled = false;
-
             window.cancelUploadTasks[fileId] = () => {
                 isCanceled = true;
                 document.getElementById(`status-${fileId}`).innerText = "تم الإلغاء";
+                document.getElementById(`prog-${fileId}`).style.background = "#ff3b30";
             };
+
+            let maxAttempts = 500;
+            let success = false;
 
             for (let attempt = 1; attempt <= maxAttempts; attempt++) {
                 if (isCanceled) break;
                 
                 try {
-                    const fileStorageRef = storageRef(storage, 'uploads/' + fileId + '_' + file.name);
-                    const uploadTask = uploadBytesResumable(fileStorageRef, file);
+                    let progress = 0;
+                    const progInterval = setInterval(() => {
+                        if(progress < 90 && !isCanceled) {
+                            progress += Math.random() * 10;
+                            document.getElementById(`status-${fileId}`).innerText = `${Math.min(Math.round(progress), 95)}% (محاولة ${attempt})`;
+                            document.getElementById(`prog-${fileId}`).style.width = `${Math.min(Math.round(progress), 95)}%`;
+                        }
+                    }, 500);
 
-                    window.cancelUploadTasks[fileId] = () => {
-                        isCanceled = true;
-                        uploadTask.cancel();
-                        document.getElementById(`status-${fileId}`).innerText = "تم الإلغاء";
-                    };
+                    const { data, error } = await supabase.storage.from('uploads').upload(filePath, file, { upsert: true });
+                    clearInterval(progInterval);
 
-                    await new Promise((resolve, reject) => {
-                        uploadTask.on('state_changed', 
-                            (snapshot) => {
-                                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                                if (!isCanceled) {
-                                    document.getElementById(`status-${fileId}`).innerText = `${Math.round(progress)}% (محاولة ${attempt})`;
-                                }
-                            }, 
-                            (error) => reject(error), 
-                            () => resolve()
-                        );
-                    });
+                    if (isCanceled) {
+                        if (data) await supabase.storage.from('uploads').remove([filePath]);
+                        break;
+                    }
 
-                    if (isCanceled) break;
+                    if (error) throw error;
 
-                    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                    document.getElementById(`status-${fileId}`).innerText = `100% (اكتمل)`;
+                    document.getElementById(`prog-${fileId}`).style.width = `100%`;
+
+                    const { data: { publicUrl } } = supabase.storage.from('uploads').getPublicUrl(filePath);
+                    const timeStr = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
                     
-                    await push(chatDbRef, {
-                        type: 'file',
-                        name: file.name,
-                        url: downloadURL,
-                        size: fileSizeFormatted,
-                        time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
-                    });
+                    await supabase.from('messages').insert([{ 
+                        type: 'file', name: file.name, url: publicUrl, size: fileSizeFormatted, time: timeStr 
+                    }]);
 
                     success = true;
                     uploadDiv.remove();
@@ -326,29 +275,21 @@
                     break;
 
                 } catch (error) {
-                    if (isCanceled || error.code === 'storage/canceled') {
-                        isCanceled = true;
-                        break;
-                    }
-                    await new Promise(res => setTimeout(res, 1000));
+                    if (isCanceled) break;
+                    await new Promise(res => setTimeout(res, 2000));
                 }
             }
 
             if (!success && !isCanceled) {
                 document.getElementById(`status-${fileId}`).innerText = "❌ فشل الرفع نهائياً.";
+                document.getElementById(`prog-${fileId}`).style.background = "#ff3b30";
             }
             fileInput.value = '';
         };
 
-        onChildAdded(chatDbRef, (snapshot) => {
-            const data = snapshot.val();
-            renderMessage(data);
-        });
-
         window.deleteAllMessages = async () => {
             if(confirm("سيتم حذف كل المحادثات والملفات من السيرفر بشكل نهائي. متأكد؟")) {
-                await remove(chatDbRef);
-                document.getElementById('chatContainer').innerHTML = '';
+                await supabase.from('messages').delete().neq('id', 0);
             }
         };
 
@@ -392,16 +333,30 @@
     </script>
 
     <script>
-        let currentThemeIndex = 0;
-        let isDarkMode = false;
+        // زرار مشاركة الرابط
+        function copyShareLink() {
+            const link = window.location.href;
+            if (link.includes("file:///")) {
+                alert("أنت تفتح الملف من الكمبيوتر مباشرة.\nلعمل رابط حقيقي، قم برفع هذا الملف على Netlify أولاً كما شرحنا.");
+            } else {
+                navigator.clipboard.writeText(link).then(() => {
+                    alert("✅ تم نسخ رابط الغرفة بنجاح!\n\nأرسله لصديقك الآن ليتمكن من الدخول وتحميل الملفات:\n" + link);
+                }).catch(err => {
+                    alert("لم يتم نسخ الرابط، يرجى نسخه يدوياً من أعلى المتصفح.");
+                });
+            }
+        }
+
+        let isLightMode = false;
 
         function toggleDarkMode() {
-            isDarkMode = !isDarkMode;
-            document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+            isLightMode = !isLightMode;
+            document.documentElement.setAttribute('data-theme', isLightMode ? 'light' : 'dark');
         }
 
         function changeTheme() {
-            currentThemeIndex = (currentThemeIndex + 1) % 40;
+            currentThemeIndex = (window.currentThemeIndex || 0) + 1;
+            window.currentThemeIndex = currentThemeIndex;
             const hue = (currentThemeIndex * 9) % 360; 
             document.documentElement.style.setProperty('--primary', `hsl(${hue}, 80%, 50%)`);
         }
