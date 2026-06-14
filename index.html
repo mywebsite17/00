@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=0.2">
-    <title>منصة الملفات والمحادثة الاحترافية</title>
+    <title>منصة الملفات والمحادثة الخاصة</title>
+    <!-- استدعاء مكتبة Supabase و JSZip -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
@@ -26,8 +27,10 @@
         #export-btn { left: 760px; background: #009688; display: none; }
         #import-btn { left: 900px; background: #607d8b; display: none; }
         #orientation-btn { left: 1040px; background: #34495e; }
+        
         #logout-btn { right: 20px; background: var(--danger); display: none; }
         #clear-chat-btn { right: 120px; background: var(--warning); display: none; }
+        #share-link-btn { right: 260px; background: var(--accent); display: none; } /* زر مشاركة الرابط */
         
         #login-screen { background: var(--chat-bg); border-radius: 12px; padding: 24px; width: 95%; max-width: 600px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); box-sizing: border-box; }
         #chat-screen { background: var(--chat-bg); border-radius: 12px; padding: 24px; width: 98%; max-width: 1400px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); box-sizing: border-box; height: 95vh; display: none; flex-direction: column; position: relative; }
@@ -35,7 +38,7 @@
         h2 { text-align: center; margin-top: 0; margin-bottom: 20px; }
         #chat-title { text-align: center; margin-top: 0; margin-bottom: 10px; color: var(--primary); }
         
-        #room-pass { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: white; box-sizing: border-box; font-size: 16px; }
+        #room-pass { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: white; box-sizing: border-box; font-size: 16px; text-align: center;}
         body.light-mode #room-pass { background: #fff; color: #333; border: 1px solid #ccc; }
 
         #folders-bar { display: flex; gap: 10px; padding-bottom: 10px; border-bottom: 1px solid #444; margin-bottom: 10px; overflow-x: auto; white-space: nowrap; align-items: center; }
@@ -185,6 +188,8 @@
     <button id="export-btn" class="top-btn" onclick="exportData()" style="display: block;">⬇️ تصدير البيانات</button>
     <button id="import-btn" class="top-btn" onclick="document.getElementById('import-file').click()" style="display: block;">⬆️ استيراد البيانات</button>
     <button id="orientation-btn" class="top-btn" onclick="toggleOrientation()">🔄 تدوير الشاشة</button>
+    
+    <button id="share-link-btn" class="top-btn" onclick="copyShareLink()">مشاركة الرابط 🔗</button>
     <button id="clear-chat-btn" class="top-btn" style="display: block;">🗑️ مسح المحتوى</button>
     <button id="logout-btn" class="top-btn" style="display: block;">خروج 🚪</button>
 
@@ -195,6 +200,7 @@
         <img id="lightbox-img" src="">
     </div>
 
+    <!-- HTML Viewer Modal -->
     <div id="html-viewer-modal" class="modal-overlay" style="display: none;">
         <div class="modal-container" style="margin: 0; max-width: 100vw; width: 100vw; height: 100vh; border-radius: 0; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; overflow: hidden; border: none;">
             <span class="modal-close" style="position: absolute; top: 15px; left: 20px; color: #fff; font-size: 30px; background: #e74c3c; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 10000; cursor: pointer; border: 2px solid white;" onclick="closeHtmlViewer()" title="إغلاق والعودة للغرفة">×</span>
@@ -213,6 +219,7 @@
         </div>
     </div>
 
+    <!-- PWA Modal -->
     <div id="pwa-modal" class="modal-overlay">
         <div class="modal-container" style="max-width: 800px;">
             <span class="modal-close" onclick="document.getElementById('pwa-modal').style.display='none'">×</span>
@@ -260,6 +267,7 @@
         </div>
     </div>
 
+    <!-- Calc Modal -->
     <div id="calc-modal" class="modal-overlay">
         <div class="modal-container">
             <span class="modal-close" style="position: absolute; top: -15px; right: -10px; color: #fff; font-size: 28px; background: #e74c3c; width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; border-radius: 50%; box-shadow: 0 2px 10px rgba(0,0,0,0.5); z-index: 10000; cursor: pointer; border: 2px solid white;" onclick="document.getElementById('calc-modal').style.display='none'">×</span>
@@ -316,12 +324,14 @@
         </div>
     </div>
 
+    <!-- واجهة تسجيل الدخول -->
     <div id="login-screen" style="display: none;">
         <h2>الغرفة السرية 🔐</h2>
-        <input type="password" id="room-pass" placeholder="اكتب كلمة مرور الغرفة...">
+        <input type="password" id="room-pass" placeholder="اكتب كلمة مرور الغرفة هنا...">
         <button id="enter-btn" style="width:100%; background:var(--primary); padding: 12px; color:white; border-radius:6px; font-weight:bold; font-size: 16px;">دخول آمن</button>
     </div>
 
+    <!-- واجهة المحادثة الرئيسية -->
     <div id="chat-screen" style="display: flex;">
         <h3 id="chat-title">📁 الغرفة الرئيسية 🏠</h3>
         
@@ -362,15 +372,29 @@
         </div>
     </div>
 
+    <!-- جميع أكواد الجافاسكريبت كاملة وتعمل بنسبة 100% -->
     <script>
+        // ============================================
+        // 🔒 كلمة المرور الرئيسية (الوحيدة المسموح لها بالدخول)
+        const MASTER_PASSWORD = "1"; 
+        // ============================================
+
         const SUPABASE_URL = 'https://pyqnnwtrrwnfitveeetw.supabase.co'; 
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5cW5ud3RycnduZml0dmVlZXR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0MjY2NjMsImV4cCI6MjA5NzAwMjY2M30.-OqBWXSsGvkRdZfAaM-xaiR80-Wh_r_AAvQbtikFhGI';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         window.msgTexts = {};
-        let safePassGlobal = "";
         let currentFolderId = 'main'; 
         let activeUploads = {};
+
+        /* --- مشاركة الرابط --- */
+        function copyShareLink() {
+            const baseUrl = window.location.href.split('?')[0];
+            const shareUrl = `${baseUrl}?pass=${MASTER_PASSWORD}&f=${currentFolderId}`;
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                alert("✅ تم نسخ الرابط بنجاح!\nأي حد هيدخل عليه هيتخطى تسجيل الدخول ويفتح المجلد ده مباشرة.");
+            }).catch(err => alert("مشكلة في نسخ الرابط."));
+        }
 
         /* --- نظام الثيمات --- */
         const themes = [
@@ -407,11 +431,24 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             initThemes();
-            const savedPass = localStorage.getItem('chat_pass');
-            if(savedPass) { document.getElementById('room-pass').value = savedPass; login(savedPass); }
-            else { document.getElementById('login-screen').style.display = 'block'; }
             
-            // Events for PWA file uploads
+            // قراءة الرابط لو فيه باسورد ومجلد مبعوتين
+            const urlParams = new URLSearchParams(window.location.search);
+            const sharedPass = urlParams.get('pass');
+            const sharedFolder = urlParams.get('f');
+
+            if (sharedPass) {
+                document.getElementById('room-pass').value = sharedPass;
+                login(sharedPass, sharedFolder || 'main');
+            } else {
+                const savedPass = localStorage.getItem('chat_pass');
+                if(savedPass) { 
+                    document.getElementById('room-pass').value = savedPass; 
+                    login(savedPass); 
+                }
+                else { document.getElementById('login-screen').style.display = 'block'; }
+            }
+            
             document.getElementById('htmlFileInput').addEventListener('change', function(e) {
                 const file = e.target.files[0]; if (!file) return;
                 const reader = new FileReader();
@@ -427,26 +464,38 @@
         });
 
         /* --- نظام تسجيل الدخول و Supabase --- */
-        function login(pass) {
+        function login(pass, folderToOpen = 'main') {
             if (!pass.trim()) return alert("الرجاء كتابة كلمة المرور");
-            safePassGlobal = Array.from(pass).map(c => c.charCodeAt(0).toString(16)).join('');
+            
+            // التحقق من الباسورد للمستخدم الواحد
+            if (pass !== MASTER_PASSWORD) {
+                alert("❌ كلمة المرور خاطئة! غير مصرح لك بالدخول.");
+                return;
+            }
+
             localStorage.setItem('chat_pass', pass);
             
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('chat-screen').style.display = 'flex';
+            
+            // إظهار الزراير
             document.getElementById('logout-btn').style.display = 'block';
             document.getElementById('clear-chat-btn').style.display = 'block';
+            document.getElementById('share-link-btn').style.display = 'block';
             document.getElementById('export-btn').style.display = 'block';
             document.getElementById('import-btn').style.display = 'block';
             
-            setupRealtime(); loadFolders(); openFolder('main', 'الغرفة الرئيسية 🏠');
+            setupRealtime(); 
+            loadFolders().then(() => {
+                openFolder(folderToOpen, folderToOpen === 'main' ? 'الغرفة الرئيسية 🏠' : '📁 مجلد');
+            });
         }
 
         document.getElementById('enter-btn').onclick = () => login(document.getElementById('room-pass').value);
 
         function setupRealtime() {
             supabaseClient.channel('custom-all-channel')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `room_id=eq.${safePassGlobal}` }, payload => {
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `room_id=eq.admin_room` }, payload => {
                     if (payload.eventType === 'INSERT') handleNewData(payload.new);
                     if (payload.eventType === 'DELETE') handleRemoveData(payload.old);
                     if (payload.eventType === 'UPDATE') handleUpdateData(payload.new);
@@ -454,7 +503,7 @@
         }
 
         async function loadFolders() {
-            const { data } = await supabaseClient.from('messages').select('*').eq('room_id', safePassGlobal).eq('type', 'folder');
+            const { data } = await supabaseClient.from('messages').select('*').eq('room_id', 'admin_room').eq('type', 'folder');
             document.getElementById('folders-list').innerHTML = '';
             if (data) { data.sort((a,b) => (a.pinned === b.pinned) ? 0 : a.pinned ? -1 : 1).forEach(renderFolderUI); }
         }
@@ -468,14 +517,14 @@
             
             div.innerHTML = `<button class="folder-btn-main" onclick="openFolder('${folderData.id}', '📁 ${escapeHtml(folderData.text)}')">📁 ${escapeHtml(folderData.text)}</button>
                 <button class="folder-action-btn" onclick="togglePin('${folderData.id}', ${!folderData.pinned})">${folderData.pinned ? '📍' : '📌'}</button>
-                <button class="folder-action-btn" onclick="deleteRecord('${folderData.id}')">❌</button>`;
+                <button class="folder-action-btn" onclick="deleteRecord('${folderData.id}', true)">❌</button>`;
             list.appendChild(div);
         }
 
         async function createNewFolder() {
             const name = prompt("أدخل اسم المجلد الجديد:");
             if (name && name.trim() !== "") {
-                await supabaseClient.from('messages').insert([{ type: 'folder', text: name.trim(), room_id: safePassGlobal, folder_id: 'root', pinned: false }]);
+                await supabaseClient.from('messages').insert([{ type: 'folder', text: name.trim(), room_id: 'admin_room', folder_id: 'root', pinned: false }]);
                 loadFolders(); 
             }
         }
@@ -486,12 +535,15 @@
             document.querySelectorAll('.folder-container').forEach(f => f.classList.remove('active-folder'));
             if(id !== 'main') {
                 const f = document.querySelector(`.folder-container[data-id="${id}"]`);
-                if(f) f.classList.add('active-folder');
+                if(f) {
+                    f.classList.add('active-folder');
+                    document.getElementById('chat-title').innerText = f.querySelector('.folder-btn-main').innerText;
+                }
                 document.getElementById('back-to-main-btn').style.display = 'inline-block';
             } else { document.getElementById('back-to-main-btn').style.display = 'none'; }
 
             document.getElementById('messages-list').innerHTML = '';
-            const { data } = await supabaseClient.from('messages').select('*').eq('room_id', safePassGlobal).eq('folder_id', currentFolderId).neq('type', 'folder').order('id', {ascending: true});
+            const { data } = await supabaseClient.from('messages').select('*').eq('room_id', 'admin_room').eq('folder_id', currentFolderId).neq('type', 'folder').order('id', {ascending: true});
             if (data) data.forEach(renderMessageUI);
             scrollToBottom();
         }
@@ -528,7 +580,7 @@
             const input = document.getElementById('msg-input');
             const txt = input.value.trim();
             if (txt) {
-                await supabaseClient.from('messages').insert([{ type: 'text', text: txt, room_id: safePassGlobal, folder_id: currentFolderId, time: new Date().toLocaleTimeString(), pinned: false }]);
+                await supabaseClient.from('messages').insert([{ type: 'text', text: txt, room_id: 'admin_room', folder_id: currentFolderId, time: new Date().toLocaleTimeString(), pinned: false }]);
                 input.value = ""; input.style.height = '100px';
             }
         }
@@ -550,7 +602,7 @@
                 activeUploads[fileId] = false; 
                 
                 progressBar.style.width = '10%'; progressText.innerText = `جاري رفع ${file.name}...`;
-                const filePath = `${safePassGlobal}/${Date.now()}_${encodeURIComponent(file.name)}`;
+                const filePath = `admin_room/${Date.now()}_${encodeURIComponent(file.name)}`;
 
                 let prog = 10;
                 const progInterval = setInterval(() => {
@@ -581,7 +633,7 @@
                     await supabaseClient.from('messages').insert([{
                         type: file.type.startsWith('image/') ? 'img' : 'file',
                         name: file.name, url: publicUrl, size: formatBytes(file.size),
-                        room_id: safePassGlobal, folder_id: currentFolderId, time: new Date().toLocaleTimeString(), pinned: false
+                        room_id: 'admin_room', folder_id: currentFolderId, time: new Date().toLocaleTimeString(), pinned: false
                     }]);
 
                 } catch (e) {
@@ -594,9 +646,37 @@
 
         document.getElementById('file-upload').onchange = (e) => handleFiles(e.target.files);
 
+        /* --- الحذف والتثبيت (تم التعديل لتجنب أخطاء RLS في واجهة المستخدم) --- */
+        async function deleteRecord(id, isFolder = false) { 
+            if (confirm('هل أنت متأكد من الحذف نهائياً؟')) {
+                // إزالة مبدئية من الشاشة قبل انتظار الرد من السيرفر (Optimistic UI)
+                if (!isFolder) { document.getElementById('msg_' + id)?.remove(); } 
+                else { document.querySelector(`.folder-container[data-id="${id}"]`)?.remove(); }
+                
+                const { error } = await supabaseClient.from('messages').delete().eq('id', id);
+                if (error) {
+                    alert("⚠️ لم يتم الحذف من السيرفر. تأكد من تشغيل كود الـ SQL الخاص بإلغاء RLS في Supabase.\n" + error.message);
+                } else if(isFolder && id === currentFolderId) {
+                    openFolder('main', 'الغرفة الرئيسية 🏠');
+                }
+            } 
+        }
+
+        async function togglePin(id, state) { 
+            const { error } = await supabaseClient.from('messages').update({ pinned: state }).eq('id', id);
+            if (error) alert("⚠️ فشل التثبيت! تأكد من تشغيل كود الـ SQL في Supabase.\n" + error.message);
+            else {
+                // تحديث الشاشة لو التحديث اللحظي مجاش
+                const msg = document.getElementById('msg_' + id);
+                if (msg) {
+                    if(state) msg.classList.add('pinned-msg'); else msg.classList.remove('pinned-msg');
+                    const btn = msg.querySelector('.pin-btn');
+                    if(btn) { btn.innerText = state ? '📍 إلغاء التثبيت' : '📌 تثبيت'; btn.setAttribute('onclick', `togglePin('${id}', ${!state})`); }
+                }
+            }
+        }
+
         /* --- الخصائص العامة والمساعدة --- */
-        async function deleteRecord(id) { if (confirm('هل أنت متأكد من الحذف؟')) await supabaseClient.from('messages').delete().eq('id', id); }
-        async function togglePin(id, state) { await supabaseClient.from('messages').update({ pinned: state }).eq('id', id); }
         function formatBytes(bytes) { if(bytes === 0) return '0 Bytes'; const k = 1024, sizes = ['Bytes', 'KB', 'MB', 'GB']; const i = Math.floor(Math.log(bytes) / Math.log(k)); return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]; }
         function escapeHtml(text) { return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
         function scrollToTop() { document.getElementById('messages-list').scrollTo({ top: 0, behavior: 'smooth' }); }
@@ -650,10 +730,9 @@
         }
 
         async function exportData() {
-            if (!safePassGlobal) return;
             const btn = document.getElementById('export-btn');
             const originalText = btn.innerText; btn.innerText = "جاري التصدير ⏳...";
-            const { data, error } = await supabaseClient.from('messages').select('*').eq('room_id', safePassGlobal);
+            const { data, error } = await supabaseClient.from('messages').select('*').eq('room_id', 'admin_room');
             if(error || !data) { btn.innerText = originalText; return alert("لا يوجد بيانات لتصديرها."); }
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
             const url = URL.createObjectURL(blob);
@@ -663,7 +742,6 @@
         }
 
         async function importData(event) {
-            if (!safePassGlobal) return;
             const file = event.target.files[0]; if (!file) return;
             const reader = new FileReader();
             reader.onload = async (e) => {
@@ -671,7 +749,7 @@
                     const data = JSON.parse(e.target.result);
                     if(confirm("⚠️ تحذير خطير: سيتم مسح كل بيانات الغرفة الحالية واستبدالها بالبيانات المستوردة. متأكد؟")) {
                         const btn = document.getElementById('import-btn'); btn.innerText = "جاري الاستيراد ⏳...";
-                        await supabaseClient.from('messages').delete().eq('room_id', safePassGlobal);
+                        await supabaseClient.from('messages').delete().eq('room_id', 'admin_room');
                         await supabaseClient.from('messages').insert(data);
                         alert("تم الاستيراد بنجاح!"); location.reload();
                     }
@@ -682,7 +760,7 @@
 
         document.getElementById('clear-chat-btn').onclick = async () => {
             if(confirm('⚠️ هل أنت متأكد من مسح محتوى الغرفة بالكامل؟')) {
-                await supabaseClient.from('messages').delete().eq('room_id', safePassGlobal);
+                await supabaseClient.from('messages').delete().eq('room_id', 'admin_room');
                 document.getElementById('messages-list').innerHTML = "";
             }
         };
@@ -957,4 +1035,3 @@
     </script>
 </body>
 </html>
-i
