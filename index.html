@@ -336,7 +336,7 @@
         <h3 id="chat-title">📁 الغرفة الرئيسية 🏠</h3>
         
         <div id="folders-bar">
-            <button id="back-to-main-btn" onclick="openFolder(null, 'الغرفة الرئيسية 🏠')" style="display: none;">🔙 العودة للرئيسية</button>
+            <button id="back-to-main-btn" onclick="openFolder('main', 'الغرفة الرئيسية 🏠')" style="display: none;">🔙 العودة للرئيسية</button>
             <button id="create-folder-btn" onclick="createNewFolder()">+ مجلد جديد</button>
             <div id="folders-list" style="display: inline-flex; gap: 8px;"></div>
         </div>
@@ -569,7 +569,7 @@
             div.innerHTML = `${d.pinned ? '<div class="pinned-badge">📌 رسالة مثبتة</div>' : ''}<div class="msg-content">${content}</div>
                 <div class="action-row">
                     ${d.type === 'text' ? `<button class="btn-copy" onclick="navigator.clipboard.writeText(\`${d.text.replace(/`/g, '\\`')}\`)">نسخ</button>` : ''}
-                    ${d.type !== 'text' ? `<button class="btn-down" onclick="window.open('${d.url}')">تنزيل</button>` : ''}
+                    ${d.type !== 'text' ? `<button class="btn-down" onclick="window.open('${d.url}', '_blank')">تنزيل</button>` : ''}
                     <button class="btn-warning-action pin-btn" onclick="togglePin('${d.id}', ${!d.pinned})">${d.pinned ? '📍 إلغاء التثبيت' : '📌 تثبيت'}</button>
                     <button class="btn-del" onclick="deleteRecord('${d.id}')">حذف</button>
                 </div><span class="msg-time">${timeStr}</span>`;
@@ -602,7 +602,10 @@
                 activeUploads[fileId] = false; 
                 
                 progressBar.style.width = '10%'; progressText.innerText = `جاري رفع ${file.name}...`;
-                const filePath = `admin_room/${Date.now()}_${encodeURIComponent(file.name)}`;
+                
+                // استبدال المسافات والرموز المعقدة عشان الروابط متتكسرش
+                const safeName = file.name.replace(/[^a-zA-Z0-9.\-_\u0600-\u06FF]/g, '_');
+                const filePath = `admin_room/${Date.now()}_${safeName}`;
 
                 let prog = 10;
                 const progInterval = setInterval(() => {
