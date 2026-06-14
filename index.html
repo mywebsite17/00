@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="version" content="v1.0.10">
+    <title>منصة الملفات - تصميم MediaFire</title>
+    <style>
+        :root {
+            --bg-color: #f5f5f7;
+            --text-color: #1d1d1f;
+            --primary: #007aff;
+            --danger: #ff3b30;
+            --panel-bg: rgba(255, 255, 255, 0.7);
+            --border-radius: 18px;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #000000;
+            --text-color: #f5f5f7;
+            --panel-bg: rgba(28, 28, 30, 0.7);
+            --primary: #0a84ff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-family); }
+
+        body {
+            background-color: var(--bg-color); color: var(--text-color);
+            transition: background-color 0.4s ease, color 0.4s ease;
+            height: 100vh; display: flex; flex-direction: column;
+        }
+
+        /* حاجز دوران الشاشة يعمل على الموبايل فقط (شاشات أقل من 768 بيكسل) */
+        @media screen and (max-width: 768px) and (orientation: landscape) {
+            #orientation-block { display: flex !important; }
+        }
+        
+        #orientation-block {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #000; color: #fff; z-index: 999999;
+            align-items: center; justify-content: center; text-align: center;
+            font-size: 22px; padding: 20px; font-weight: bold;
+        }
+
+        header {
+            background: var(--panel-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            padding: 15px 20px; display: flex; flex-wrap: wrap; gap: 10px;
+            justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(128, 128, 128, 0.2); position: sticky; top: 0; z-index: 100;
+        }
+
+        .controls button, .controls select {
+            background: var(--primary); color: white; border: none; padding: 8px 12px;
+            border-radius: 20px; cursor: pointer; font-size: 13px; margin-left: 5px; margin-bottom: 5px;
+        }
+        .controls .btn-danger { background: var(--danger); }
+
+        .chat-container {
+            flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px;
+        }
+
+        .message-wrapper { display: flex; align-items: center; gap: 10px; max-width: 95%; }
+        .message-wrapper.sent { align-self: flex-end; flex-direction: row-reverse; }
+        .message-wrapper.received { align-self: flex-start; }
+
+        .message {
+            background: var(--panel-bg); padding: 15px; border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: relative; min-width: 150px;
+        }
+        .message.sent { background: var(--primary); color: white; }
+
+        .timestamp { font-size: 11px; opacity: 0.7; margin-top: 8px; text-align: left; direction: ltr; }
+
+        /* تصميم MediaFire */
+        .mediafire-card {
+            background: #ffffff;
+            border: 1px solid #d3d9e0;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            gap: 15px;
+            margin-top: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            color: #333;
+            font-family: Arial, sans-serif;
+            min-width: 280px;
+            max-width: 450px;
+            direction: ltr; 
+            text-align: left;
+        }
+
+        [data-theme="dark"] .mediafire-card {
+            background: #242424;
+            border-color: #383838;
+            color: #eee;
+        }
+
+        .mediafire-icon {
+            font-size: 28px;
+            color: #8fa2b4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mediafire-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            overflow: hidden;
+        }
+
+        .mediafire-filename {
+            font-weight: bold;
+            font-size: 14px;
+            color: #1275d8; 
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        [data-theme="dark"] .mediafire-filename { color: #5aa9fa; }
+
+        .mediafire-meta {
+            font-size: 11px;
+            color: #6c757d;
+            font-weight: normal;
+        }
+
+        .mediafire-download-btn {
+            background: #118120; 
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .mediafire-download-btn:hover { background: #0d6318; }
+
+        .input-area {
+            background: var(--panel-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            padding: 15px; display: flex; gap: 10px; border-top: 1px solid rgba(128, 128, 128, 0.2); align-items: flex-end;
+        }
+
+        textarea {
+            flex: 1; min-height: 45px; max-height: 150px; border-radius: var(--border-radius);
+            border: 1px solid rgba(128, 128, 128, 0.3); padding: 12px; resize: vertical;
+            background: transparent; color: var(--text-color); outline: none;
+        }
+
+        .action-btn {
+            background: var(--primary); color: white; border: none; width: 45px; height: 45px;
+            border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 20px;
+        }
+        .action-btn.secondary { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
+
+        .upload-status { font-size: 12px; margin-top: 8px; display: flex; justify-content: space-between; font-weight: bold; }
+        .cancel-upload { color: #ffcc00; cursor: pointer; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 10px;}
+    </style>
+</head>
+<body>
+
+    <div id="orientation-block">
+        يرجى تدوير الهاتف للوضع الرأسي (Portrait) للمتابعة.
+    </div>
+
+    <header>
+        <div class="controls">
+            <button onclick="toggleDarkMode()">☀️/🌙</button>
+            <button onclick="changeTheme()">تغيير الثيم</button>
+            <button onclick="document.getElementById('fileInput').click()">📁 تصفح المجلدات</button>
+        </div>
+        <div class="controls">
+            <button class="btn-danger" onclick="deleteAllMessages()">حذف الكل من السيرفر</button>
+        </div>
+        <div class="controls" style="width: 100%;">
+            <select id="musicSelector" onchange="playMusic()" style="width: 100%;">
+                <option value="">🎵 اختر موسيقى للاسترخاء...</option>
+                <option value="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=relaxing-music-vol1-112148.mp3">موسيقى هادئة 1</option>
+                <option value="https://cdn.pixabay.com/download/audio/2022/02/10/audio_fc48af67b2.mp3?filename=forest-lullaby-110624.mp3">موسيقى الغابة 2</option>
+                <option value="https://cdn.pixabay.com/download/audio/2021/08/25/audio_8cecd65882.mp3?filename=ambient-piano-amp-strings-10711.mp3">بيانو استرخاء 3</option>
+            </select>
+            <audio id="bgMusic" loop></audio>
+        </div>
+    </header>
+
+    <div class="chat-container" id="chatContainer">
+        </div>
+
+    <div class="input-area">
+        <input type="file" id="fileInput" style="display: none;" onchange="handleFileUpload()">
+        <button class="action-btn secondary" onclick="document.getElementById('fileInput').click()">📎</button>
+        <button class="action-btn secondary" title="لصق" onclick="pasteText()">📋</button>
+        <textarea id="messageInput" placeholder="اكتب رسالتك هنا..."></textarea>
+        <button class="action-btn" onclick="sendMessage()">⬆️</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getDatabase, ref as dbRef, push, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+        import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBtIkF-UhkeFa-cxutgJAQpR7K_IjKxloc",
+            authDomain: "spygame-337ee.firebaseapp.com",
+            databaseURL: "https://spygame-337ee-default-rtdb.firebaseio.com", 
+            projectId: "spygame-337ee",
+            storageBucket: "spygame-337ee.firebasestorage.app"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const storage = getStorage(app);
+        const chatDbRef = dbRef(db, 'messages');
+
+        const notificationSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+        const chatContainer = document.getElementById('chatContainer');
+        
+        window.cancelUploadTasks = {};
+
+        window.sendMessage = async () => {
+            const input = document.getElementById('messageInput');
+            if (input.value.trim() === '') return;
+            
+            const msgData = {
+                type: 'text',
+                text: input.value,
+                time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+            };
+            
+            input.value = '';
+            await push(chatDbRef, msgData);
+            notificationSound.play().catch(e => {});
+        };
+
+        window.handleFileUpload = async () => {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const fileId = 'file_' + Date.now();
+            const fileSizeFormatted = formatBytes(file.size);
+            
+            const uploadDiv = document.createElement('div');
+            uploadDiv.className = `message-wrapper sent`;
+            uploadDiv.id = `wrapper-${fileId}`;
+            uploadDiv.innerHTML = `
+                <div class="message sent">
+                    <div class="mediafire-card">
+                        <div class="mediafire-icon">📄</div>
+                        <div class="mediafire-info">
+                            <div class="mediafire-filename">${file.name}</div>
+                            <div class="mediafire-meta">${fileSizeFormatted} - Uploading...</div>
+                        </div>
+                    </div>
+                    <div class="upload-status">
+                        <span id="status-${fileId}">0% (محاولة 1)</span>
+                        <span class="cancel-upload" onclick="cancelUploadTasks['${fileId}']()">إلغاء ✖</span>
+                    </div>
+                </div>
+            `;
+            chatContainer.appendChild(uploadDiv);
+            chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+
+            let maxAttempts = 100;
+            let success = false;
+            let isCanceled = false;
+
+            window.cancelUploadTasks[fileId] = () => {
+                isCanceled = true;
+                document.getElementById(`status-${fileId}`).innerText = "تم الإلغاء";
+            };
+
+            for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+                if (isCanceled) break;
+                
+                try {
+                    const fileStorageRef = storageRef(storage, 'uploads/' + fileId + '_' + file.name);
+                    const uploadTask = uploadBytesResumable(fileStorageRef, file);
+
+                    window.cancelUploadTasks[fileId] = () => {
+                        isCanceled = true;
+                        uploadTask.cancel();
+                        document.getElementById(`status-${fileId}`).innerText = "تم الإلغاء";
+                    };
+
+                    await new Promise((resolve, reject) => {
+                        uploadTask.on('state_changed', 
+                            (snapshot) => {
+                                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                                if (!isCanceled) {
+                                    document.getElementById(`status-${fileId}`).innerText = `${Math.round(progress)}% (محاولة ${attempt})`;
+                                }
+                            }, 
+                            (error) => reject(error), 
+                            () => resolve()
+                        );
+                    });
+
+                    if (isCanceled) break;
+
+                    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                    
+                    await push(chatDbRef, {
+                        type: 'file',
+                        name: file.name,
+                        url: downloadURL,
+                        size: fileSizeFormatted,
+                        time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+                    });
+
+                    success = true;
+                    uploadDiv.remove();
+                    notificationSound.play().catch(e => {});
+                    break;
+
+                } catch (error) {
+                    if (isCanceled || error.code === 'storage/canceled') {
+                        isCanceled = true;
+                        break;
+                    }
+                    await new Promise(res => setTimeout(res, 1000));
+                }
+            }
+
+            if (!success && !isCanceled) {
+                document.getElementById(`status-${fileId}`).innerText = "❌ فشل الرفع نهائياً.";
+            }
+            fileInput.value = '';
+        };
+
+        onChildAdded(chatDbRef, (snapshot) => {
+            const data = snapshot.val();
+            renderMessage(data);
+        });
+
+        window.deleteAllMessages = async () => {
+            if(confirm("سيتم حذف كل المحادثات والملفات من السيرفر بشكل نهائي. متأكد؟")) {
+                await remove(chatDbRef);
+                document.getElementById('chatContainer').innerHTML = '';
+            }
+        };
+
+        function renderMessage(data) {
+            const wrapper = document.createElement('div');
+            wrapper.className = `message-wrapper received`; 
+            
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message received`;
+            
+            if (data.type === 'text') {
+                msgDiv.innerHTML = `${data.text} <div class="timestamp">${data.time}</div>`;
+            } else if (data.type === 'file') {
+                msgDiv.innerHTML = `
+                    <div class="mediafire-card">
+                        <div class="mediafire-icon">📄</div>
+                        <div class="mediafire-info">
+                            <div class="mediafire-filename" title="${data.name}">${data.name}</div>
+                            <div class="mediafire-meta">${data.size}</div>
+                        </div>
+                        <a href="${data.url}" class="mediafire-download-btn" target="_blank" download>
+                            ⬇ DOWNLOAD
+                        </a>
+                    </div>
+                    <div class="timestamp">${data.time}</div>
+                `;
+            }
+
+            wrapper.appendChild(msgDiv);
+            chatContainer.appendChild(wrapper);
+            chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+        }
+
+        function formatBytes(bytes) {
+            if(bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+    </script>
+
+    <script>
+        let currentThemeIndex = 0;
+        let isDarkMode = false;
+
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+        }
+
+        function changeTheme() {
+            currentThemeIndex = (currentThemeIndex + 1) % 40;
+            const hue = (currentThemeIndex * 9) % 360; 
+            document.documentElement.style.setProperty('--primary', `hsl(${hue}, 80%, 50%)`);
+        }
+
+        function playMusic() {
+            const audioPlayer = document.getElementById('bgMusic');
+            const selectedMusic = document.getElementById('musicSelector').value;
+            if (selectedMusic) {
+                audioPlayer.src = selectedMusic;
+                audioPlayer.play();
+            } else {
+                audioPlayer.pause();
+            }
+        }
+
+        async function pasteText() {
+            try {
+                const text = await navigator.clipboard.readText();
+                document.getElementById('messageInput').value += text;
+            } catch (err) {
+                alert("يرجى إعطاء صلاحية الوصول للحافظة.");
+            }
+        }
+    </script>
+</body>
+</html>
