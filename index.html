@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="version" content="v1.0.6">
+    <title>منصة الملفات والمحادثة</title>
+    <style>
+        :root {
+            --bg-color: #f5f5f7;
+            --text-color: #1d1d1f;
+            --primary: #007aff;
+            --danger: #ff3b30;
+            --panel-bg: rgba(255, 255, 255, 0.7);
+            --border-radius: 18px;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #000000;
+            --text-color: #f5f5f7;
+            --panel-bg: rgba(28, 28, 30, 0.7);
+            --primary: #0a84ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.4s ease, color 0.4s ease;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 15px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .controls button, .controls select {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-left: 5px;
+        }
+
+        .controls .btn-danger {
+            background: var(--danger);
+        }
+
+        .chat-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 85%;
+        }
+
+        .message-wrapper.sent {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message-wrapper.received {
+            align-self: flex-start;
+        }
+
+        .message {
+            background: var(--panel-bg);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .message.sent {
+            background: var(--primary);
+            color: white;
+        }
+
+        .file-box {
+            background: rgba(255,255,255,0.2);
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .file-box a {
+            color: inherit;
+            text-decoration: none;
+            font-size: 20px;
+        }
+
+        .msg-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .input-area {
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid rgba(128, 128, 128, 0.2);
+            align-items: flex-end;
+        }
+
+        textarea {
+            flex: 1;
+            min-height: 45px;
+            max-height: 150px;
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(128, 128, 128, 0.3);
+            padding: 12px;
+            resize: vertical;
+            background: transparent;
+            color: var(--text-color);
+            outline: none;
+        }
+
+        .action-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+        }
+
+        .action-btn.secondary {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .upload-status {
+            font-size: 12px;
+            margin-top: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .cancel-upload {
+            color: #ffcc00;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="manifest" href="./manifest.json?v=v1781432444259">
+    <meta name="theme-color" content="#1d3863">
+    <link rel="apple-touch-icon" href="./icon-192.png?v=v1781432444259">
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js?v=v1781432444259')
+            .then(reg => console.log('SW Registered'))
+            .catch(err => console.log('SW Failed', err));
+        });
+      }
+    </script>
+</head>
+<body>
+
+    <header>
+        <div class="controls">
+            <button onclick="toggleDarkMode()">☀️/🌙</button>
+            <button onclick="changeTheme()">تغيير الثيم</button>
+            <button onclick="generateShareLink()">مشاركة الرابط 🔗</button>
+        </div>
+        <div class="controls">
+            <button class="btn-danger" onclick="deleteSelected()">حذف المحدد</button>
+            <button class="btn-danger" onclick="deleteAll()">حذف الكل</button>
+        </div>
+        <div class="controls" style="width: 100%; margin-top: 10px;">
+            <select id="musicSelector" onchange="playMusic()" style="width: 100%;">
+                <option value="">🎵 اختر موسيقى للاسترخاء...</option>
+                <option value="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=relaxing-music-vol1-112148.mp3">موسيقى هادئة 1</option>
+                <option value="https://cdn.pixabay.com/download/audio/2022/02/10/audio_fc48af67b2.mp3?filename=forest-lullaby-110624.mp3">موسيقى الغابة 2</option>
+                <option value="https://cdn.pixabay.com/download/audio/2021/08/25/audio_8cecd65882.mp3?filename=ambient-piano-amp-strings-10711.mp3">بيانو استرخاء 3</option>
+            </select>
+            <audio id="bgMusic" loop></audio>
+        </div>
+    </header>
+
+    <div class="chat-container" id="chatContainer">
+        </div>
+
+    <div class="input-area">
+        <input type="file" id="fileInput" style="display: none;" onchange="handleFileUpload()">
+        <button class="action-btn secondary" onclick="document.getElementById('fileInput').click()">📁</button>
+        <button class="action-btn secondary" title="لصق" onclick="pasteText()">📋</button>
+        <textarea id="messageInput" placeholder="اكتب رسالتك هنا..."></textarea>
+        <button class="action-btn" onclick="sendMessage()">⬆️</button>
+    </div>
+
+    <script>
+        // قفل الشاشة (غالباً ما تمنعه المتصفحات إلا إذا كان الموقع في وضع ملء الشاشة PWA)
+        async function lockScreenOrientation() {
+            try {
+                if (screen.orientation && screen.orientation.lock) {
+                    await screen.orientation.lock('portrait');
+                }
+            } catch (error) {
+                console.log("المتصفح ما زال يسمح بالدوران، يتطلب PWA.");
+            }
+        }
+        document.addEventListener('click', lockScreenOrientation, { once: true });
+
+        const notificationSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+
+        let currentThemeIndex = 0;
+        let isDarkMode = false;
+
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+        }
+
+        function changeTheme() {
+            currentThemeIndex = (currentThemeIndex + 1) % 40;
+            const hue = (currentThemeIndex * 9) % 360; 
+            document.documentElement.style.setProperty('--primary', `hsl(${hue}, 80%, 50%)`);
+        }
+
+        function playMusic() {
+            const audioPlayer = document.getElementById('bgMusic');
+            const selectedMusic = document.getElementById('musicSelector').value;
+            if (selectedMusic) {
+                audioPlayer.src = selectedMusic;
+                audioPlayer.play().catch(e => alert("يجب التفاعل مع الصفحة أولاً لتشغيل الصوت."));
+            } else {
+                audioPlayer.pause();
+            }
+        }
+
+        function generateShareLink() {
+            // هنا نولد رابط وهمي للمشاركة، في الحقيقي سيكون رابط غرفتك في السيرفر
+            const dummyLink = window.location.href.split('?')[0] + "?chat=room_" + Math.floor(Math.random() * 10000);
+            navigator.clipboard.writeText(dummyLink);
+            alert("تم نسخ الرابط! (تذكر: الرابط لن ينقل الملفات فعلياً لصديقك بدون استضافة خلفية Backend).\n\nالرابط المنسوخ: " + dummyLink);
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            if (input.value.trim() === '') return;
+            appendMessage(input.value, 'sent');
+            input.value = '';
+            notificationSound.play().catch(e => {});
+        }
+
+        function appendMessage(text, type, extraHTML = '') {
+            const container = document.getElementById('chatContainer');
+            const wrapper = document.createElement('div');
+            wrapper.className = `message-wrapper ${type}`;
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'msg-checkbox';
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${type}`;
+            msgDiv.innerHTML = text + extraHTML;
+
+            wrapper.appendChild(checkbox);
+            wrapper.appendChild(msgDiv);
+            container.appendChild(wrapper);
+            container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+        }
+
+        function deleteSelected() {
+            const checkboxes = document.querySelectorAll('.msg-checkbox:checked');
+            checkboxes.forEach(cb => {
+                cb.closest('.message-wrapper').remove();
+            });
+        }
+
+        function deleteAll() {
+            if(confirm("هل أنت متأكد من حذف جميع المحادثات والملفات؟")) {
+                document.getElementById('chatContainer').innerHTML = '';
+            }
+        }
+
+        async function pasteText() {
+            try {
+                const text = await navigator.clipboard.readText();
+                document.getElementById('messageInput').value += text;
+            } catch (err) {
+                alert("لم يتم السماح بالوصول للحافظة.");
+            }
+        }
+
+        let cancelUploadFlag = false;
+
+        async function handleFileUpload() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            cancelUploadFlag = false;
+            const fileId = 'file-' + Date.now();
+            
+            // إنشاء رابط تنزيل محلي (يعمل فقط على جهازك الحالي حتى يتم ربط السيرفر)
+            const fileURL = URL.createObjectURL(file);
+
+            const fileHtml = `
+                <div class="file-box">
+                    <span>📄 ${file.name}</span>
+                    <a href="${fileURL}" download="${file.name}" title="تنزيل الملف">📥</a>
+                </div>
+                <div class="upload-status">
+                    <span id="status-${fileId}">جاري الرفع... (محاولة 1/100)</span>
+                    <span class="cancel-upload" onclick="cancelUpload()">إلغاء ✖</span>
+                </div>
+            `;
+            appendMessage("", 'sent', fileHtml);
+
+            let maxAttempts = 100;
+            let success = false;
+
+            for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+                if (cancelUploadFlag) {
+                    document.getElementById(`status-${fileId}`).innerText = "تم إلغاء الرفع.";
+                    return;
+                }
+
+                document.getElementById(`status-${fileId}`).innerText = `جاري الرفع... (محاولة ${attempt}/100)`;
+                await new Promise(resolve => setTimeout(resolve, 800)); // محاكاة سرعة الرفع
+
+                if (attempt === 3) { // محاكاة نجاح الرفع
+                    success = true;
+                    break;
+                }
+            }
+
+            const statusEl = document.getElementById(`status-${fileId}`);
+            if (success) {
+                statusEl.innerText = "✅ اكتمل الرفع.";
+                statusEl.style.color = "#fff";
+                notificationSound.play().catch(e => {});
+            } else {
+                statusEl.innerText = "❌ فشل الرفع بعد 100 محاولة.";
+            }
+        }
+
+        function cancelUpload() {
+            cancelUploadFlag = true;
+        }
+
+        // إرسال رسالة ترحيبية أولية
+        appendMessage("أهلاً بك. يمكنك الآن التحديد، الحذف، التنزيل، وسماع الموسيقى.", "received");
+
+    </script>
+</body>
+</html>
