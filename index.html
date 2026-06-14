@@ -8,52 +8,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         :root { 
-            --primary: #4a90e2; 
-            --primary-hover: #357abd;
-            --bg-color: #121212; 
-            --chat-bg: #1e1e1e; 
-            --text-dark: #e0e0e0; 
-            --msg-bg: #2a2a2a; 
-            --accent: #27ae60;
-            --danger: #e74c3c;
-            --warning: #f39c12;
-            --purple: #8e44ad;
-            --orange: #e67e22;
-            --folder-bg: #34495e;
+            --primary: #4a90e2; --primary-hover: #357abd; --bg-color: #121212; --chat-bg: #1e1e1e; 
+            --text-dark: #e0e0e0; --msg-bg: #2a2a2a; --accent: #27ae60; --danger: #e74c3c;
+            --warning: #f39c12; --purple: #8e44ad; --orange: #e67e22; --folder-bg: #34495e;
             --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
-        body.light-mode { 
-            --bg-color: #f4f7f6; 
-            --chat-bg: #ffffff; 
-            --text-dark: #333; 
-            --msg-bg: #e3f2fd; 
-            --folder-bg: #ecf0f1;
-        }
-        body { 
-            font-family: var(--font-family); 
-            background-color: var(--bg-color); 
-            color: var(--text-dark); 
-            margin: 0; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            transition: background 0.3s;
-            overflow: hidden;
-        }
-        .top-btn { 
-            position: absolute; 
-            top: 20px; 
-            padding: 8px 16px; 
-            border-radius: 20px; 
-            cursor: pointer; 
-            border: none; 
-            color: white; 
-            z-index: 100; 
-            font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            transition: transform 0.2s;
-        }
+        body.light-mode { --bg-color: #f4f7f6; --chat-bg: #ffffff; --text-dark: #333; --msg-bg: #e3f2fd; --folder-bg: #ecf0f1; }
+        body { font-family: var(--font-family); background-color: var(--bg-color); color: var(--text-dark); margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; transition: background 0.3s; overflow: hidden; }
+        .top-btn { position: absolute; top: 20px; padding: 8px 16px; border-radius: 20px; cursor: pointer; border: none; color: white; z-index: 100; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.2s; }
         .top-btn:hover { transform: scale(1.05); }
         
         #theme-selector { left: 20px; background: var(--primary); outline: none; border: none; appearance: none; text-align: center; padding: 8px 20px; font-family: inherit;}
@@ -67,61 +29,21 @@
         #logout-btn { right: 20px; background: var(--danger); display: none; }
         #clear-chat-btn { right: 120px; background: var(--warning); display: none; }
         
-        #login-screen { 
-            background: var(--chat-bg); 
-            border-radius: 12px; 
-            padding: 24px; 
-            width: 95%; 
-            max-width: 600px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            box-sizing: border-box;
-        }
-        
-        #chat-screen { 
-            background: var(--chat-bg); 
-            border-radius: 12px; 
-            padding: 24px; 
-            width: 98%; 
-            max-width: 1400px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            box-sizing: border-box;
-            height: 95vh; 
-            display: none; 
-            flex-direction: column; 
-            position: relative;
-        }
+        #login-screen { background: var(--chat-bg); border-radius: 12px; padding: 24px; width: 95%; max-width: 600px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); box-sizing: border-box; }
+        #chat-screen { background: var(--chat-bg); border-radius: 12px; padding: 24px; width: 98%; max-width: 1400px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); box-sizing: border-box; height: 95vh; display: none; flex-direction: column; position: relative; }
         
         h2 { text-align: center; margin-top: 0; margin-bottom: 20px; }
         #chat-title { text-align: center; margin-top: 0; margin-bottom: 10px; color: var(--primary); }
         
-        #room-pass {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border-radius: 6px;
-            border: 1px solid #444;
-            background: #2a2a2a;
-            color: white;
-            box-sizing: border-box;
-            font-size: 16px;
-        }
+        #room-pass { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: white; box-sizing: border-box; font-size: 16px; }
         body.light-mode #room-pass { background: #fff; color: #333; border: 1px solid #ccc; }
 
-        #folders-bar {
-            display: flex; gap: 10px; padding-bottom: 10px; border-bottom: 1px solid #444;
-            margin-bottom: 10px; overflow-x: auto; white-space: nowrap; align-items: center;
-        }
+        #folders-bar { display: flex; gap: 10px; padding-bottom: 10px; border-bottom: 1px solid #444; margin-bottom: 10px; overflow-x: auto; white-space: nowrap; align-items: center; }
         body.light-mode #folders-bar { border-bottom: 1px solid #ccc; }
         
-        .folder-container {
-            display: inline-flex; align-items: center; background: var(--folder-bg);
-            border: 1px solid #555; border-radius: 20px; padding: 0 10px; gap: 6px; transition: 0.2s;
-        }
+        .folder-container { display: inline-flex; align-items: center; background: var(--folder-bg); border: 1px solid #555; border-radius: 20px; padding: 0 10px; gap: 6px; transition: 0.2s; }
         body.light-mode .folder-container { border-color: #ccc; }
-
-        .folder-container.active-folder {
-            background-color: var(--primary) !important; border-color: #fff !important; box-shadow: 0 0 8px rgba(0,0,0,0.3);
-        }
+        .folder-container.active-folder { background-color: var(--primary) !important; border-color: #fff !important; box-shadow: 0 0 8px rgba(0,0,0,0.3); }
         .folder-container.active-folder .folder-btn-main { color: #fff !important; }
         
         .folder-btn-main { background: none; color: var(--text-dark); border: none; padding: 6px 0; cursor: pointer; font-size: 13px; font-weight: bold; font-family: inherit; }
@@ -138,18 +60,12 @@
         #messages-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 10px; border-bottom: 1px solid #333; scroll-behavior: smooth; }
         body.light-mode #messages-list { border-bottom: 1px solid #eee; }
 
-        #scroll-to-top-btn, #scroll-to-bottom-btn {
-            position: absolute; bottom: 130px; background: var(--primary); color: white; border: none; width: 45px; height: 45px;
-            border-radius: 50%; font-size: 20px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 100; transition: transform 0.2s;
-        }
+        #scroll-to-top-btn, #scroll-to-bottom-btn { position: absolute; bottom: 130px; background: var(--primary); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 20px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 100; transition: transform 0.2s; }
         #scroll-to-top-btn { left: 30px; background: var(--accent); }
         #scroll-to-bottom-btn { left: 85px; }
         #scroll-to-top-btn:hover, #scroll-to-bottom-btn:hover { transform: scale(1.1); }
 
-        .message-box { 
-            background: var(--msg-bg); padding: 12px; border-radius: 8px; max-width: 85%; align-self: flex-start; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1); word-break: break-word; position: relative; animation: fadeIn 0.3s ease-in-out; transition: 0.3s border; order: 2;
-        }
+        .message-box { background: var(--msg-bg); padding: 12px; border-radius: 8px; max-width: 85%; align-self: flex-start; box-shadow: 0 1px 3px rgba(0,0,0,0.1); word-break: break-word; position: relative; animation: fadeIn 0.3s ease-in-out; transition: 0.3s border; order: 2; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .pinned-msg { border: 2px solid var(--warning) !important; box-shadow: 0 0 10px rgba(243, 156, 18, 0.3) !important; background-color: rgba(243, 156, 18, 0.05); order: 1 !important; }
@@ -263,7 +179,7 @@
     <select id="theme-selector" class="top-btn" onchange="applyTheme(this.value)"></select>
     <button id="open-pwa-btn" class="top-btn" onclick="document.getElementById('pwa-modal').style.display='flex';">🛠️ صانع PWA</button>
     <button id="open-calc-btn" class="top-btn" onclick="document.getElementById('calc-modal').style.display='flex'">🧮 الآلة الحاسبة</button>
-    <button id="open-html-viewer-btn" class="top-btn" onclick="document.getElementById('html-viewer-modal').style.display='flex'">👁️ عارض HTML</button>
+    <button id="open-html-viewer-btn" class="top-btn" onclick="document.getElementById('html-viewer-modal').style.display='flex'; initHtmlTabs();">👁️ عارض HTML</button>
 
     <button id="save-page-btn" class="top-btn" onclick="saveWholePageAsHTML()">💾 حفظ الصفحة</button>
     <button id="export-btn" class="top-btn" onclick="exportData()" style="display: block;">⬇️ تصدير البيانات</button>
@@ -310,13 +226,36 @@
                     <select class="pwa-select" id="appOrientation"><option value="portrait" selected>بالطول</option><option value="any">تلقائي</option><option value="landscape">بالعرض</option></select>
                 </div>
                 <div class="pwa-form-group"><label>رقم الكاش</label><input type="text" class="pwa-input" id="cacheVersion" value="v1"></div>
+                
+                <div class="pwa-form-group">
+                    <label>رفع أيقونة خاصة (اختياري)</label>
+                    <div class="pwa-file-wrapper">
+                        <div class="pwa-file-btn" id="iconUploadLabel">🖼️ اختر صورة للأيقونة</div>
+                        <input type="file" id="iconFileInput" accept="image/*">
+                    </div>
+                </div>
+
                 <div class="pwa-form-group"><label>لون الواجهة</label><input type="color" class="pwa-input" id="themeColor" value="#3b82f6" style="height: 45px; padding: 2px; cursor: pointer;"></div>
-                <div class="pwa-form-group"><label>كود الصفحة</label><textarea class="pwa-textarea" id="inputHtml" rows="6" placeholder="<!DOCTYPE html>..."></textarea></div>
+                
+                <div class="pwa-form-group">
+                    <label>كود صفحتك الأصلية (index.html)</label>
+                    <button type="button" onclick="pastePwaCode()" style="margin-bottom: 10px; cursor: pointer; background: var(--purple); border: none; color: white; padding: 8px 12px; border-radius: 6px; font-size: 0.9rem; font-weight: bold;">📋 لصق من الحافظة</button>
+                    <div class="pwa-file-wrapper">
+                        <div class="pwa-file-btn" id="htmlUploadLabel">📂 ارفع ملف index.html من جهازك</div>
+                        <input type="file" id="htmlFileInput" accept=".html, .htm">
+                    </div>
+                    <textarea class="pwa-textarea" id="inputHtml" rows="6" placeholder="<!DOCTYPE html>..."></textarea>
+                </div>
+                
                 <button class="pwa-btn-main" onclick="generateAllFiles()">توليد وتجهيز الملفات ⚡</button>
             </div>
             <div class="pwa-card" id="resultsCard" style="display: none;">
                 <h2 style="color: var(--accent);">الملفات الجاهزة 📁</h2>
                 <button class="pwa-btn-zip" onclick="downloadAsZip()">تحميل الـ 6 ملفات في فولدر ZIP 📦</button>
+                <div class="pwa-preview-box" style="margin-bottom: 20px;">
+                    <div style="text-align: center;"><img id="icon192Preview" src="" style="width: 96px; height: 96px;"><div style="font-size: 0.8rem; color: #888; margin-top: 5px;">مقاس 192x192</div></div>
+                    <div style="text-align: center;"><img id="icon512Preview" src="" style="width: 120px; height: 120px;"><div style="font-size: 0.8rem; color: #888; margin-top: 5px;">مقاس 512x512</div></div>
+                </div>
             </div>
         </div>
     </div>
@@ -349,22 +288,22 @@
                         <button class="btn-on" onclick="clearCalcScreen()">ON</button>
                     </div>
                     <div class="row-5">
-                        <button class="btn-sci" onclick="insertCalc('abs(')">abs</button><button class="btn-sci" onclick="insertCalc('^3')">x³</button><button class="btn-sci" onclick="handleCalcShiftBtn('!', '^-1')">x⁻¹</button><button class="btn-sci" onclick="insertCalc('log(')">log</button><button class="btn-sci" onclick="insertCalc('ln(')">ln</button>
+                        <button class="btn-sci" onclick="insertCalc('abs(')">abs</button><button class="btn-sci" onclick="insertCalc('^3')">x³</button><button class="btn-sci" onclick="handleCalcShiftBtn('!', '^-1')"><span class="shift-text" style="font-size:10px; color:#f1c40f; position:absolute; top:2px; left:4px;">x!</span>x⁻¹</button><button class="btn-sci" onclick="insertCalc('log(')">log</button><button class="btn-sci" onclick="insertCalc('ln(')">ln</button>
                     </div>
                     <div class="row-5">
                         <button class="btn-sci" onclick="insertCalc('pi')">π</button><button class="btn-sci" onclick="insertCalc('sqrt(')">√</button><button class="btn-sci" onclick="insertCalc('^2')">x²</button><button class="btn-sci" onclick="insertCalc('^')">x^</button><button class="btn-sci" onclick="insertCalc('×10^')">10^x</button>
                     </div>
                     <div class="row-5">
-                        <button class="btn-sci" onclick="handleCalcAlphaBtn('A', '-')">(-)</button><button class="btn-sci" onclick="insertCalc('Ans')">Ans</button><button class="btn-sci" onclick="handleCalcAlphaBtn('B', 'hyp')">hyp</button><button class="btn-sci" id="btn-calc-sin" onclick="insertCalcTrig('sin')">sin</button><button class="btn-sci" id="btn-calc-cos" onclick="insertCalcTrig('cos')">cos</button>
+                        <button class="btn-sci" onclick="handleCalcAlphaBtn('A', '-')"><span class="alpha-text" style="font-size:10px; color:#e74c3c; position:absolute; top:2px; right:4px;">A</span>(-)</button><button class="btn-sci" onclick="insertCalc('Ans')">Ans</button><button class="btn-sci" onclick="handleCalcAlphaBtn('B', 'hyp')"><span class="alpha-text" style="font-size:10px; color:#e74c3c; position:absolute; top:2px; right:4px;">B</span>hyp</button><button class="btn-sci" id="btn-calc-sin" onclick="insertCalcTrig('sin')">sin</button><button class="btn-sci" id="btn-calc-cos" onclick="insertCalcTrig('cos')">cos</button>
                     </div>
                     <div class="row-5">
-                        <button class="btn-sci" id="btn-calc-tan" onclick="insertCalcTrig('tan')">tan</button><button class="btn-sci" onclick="handleCalcAlphaBtn('X', '(')">(</button><button class="btn-sci" onclick="handleCalcAlphaBtn('Y', ')')">)</button><button class="btn-sci" onclick="insertCalc('S<=>D')">S⇔D</button><button class="btn-sci" onclick="handleCalcAlphaBtn('M', 'M+')">M+</button>
+                        <button class="btn-sci" id="btn-calc-tan" onclick="insertCalcTrig('tan')">tan</button><button class="btn-sci" onclick="handleCalcAlphaBtn('X', '(')"><span class="alpha-text" style="font-size:10px; color:#e74c3c; position:absolute; top:2px; right:4px;">X</span>(</button><button class="btn-sci" onclick="handleCalcAlphaBtn('Y', ')')"><span class="alpha-text" style="font-size:10px; color:#e74c3c; position:absolute; top:2px; right:4px;">Y</span>)</button><button class="btn-sci" onclick="insertCalc('S<=>D')">S⇔D</button><button class="btn-sci" onclick="handleCalcAlphaBtn('M', 'M+')"><span class="alpha-text" style="font-size:10px; color:#e74c3c; position:absolute; top:2px; right:4px;">M</span>M+</button>
                     </div>
                     <div class="row-5">
                         <button class="btn-num" onclick="insertCalc('7')">7</button><button class="btn-num" onclick="insertCalc('8')">8</button><button class="btn-num" onclick="insertCalc('9')">9</button><button class="btn-del-ac" onclick="deleteCalcAtCursor()">DEL</button><button class="btn-del-ac" onclick="clearCalcScreen()">AC</button>
                     </div>
                     <div class="row-5">
-                        <button class="btn-num" onclick="insertCalc('4')">4</button><button class="btn-num" onclick="insertCalc('5')">5</button><button class="btn-num" onclick="insertCalc('6')">6</button><button class="btn-op" onclick="handleCalcShiftBtn('P', '×')">×</button><button class="btn-op" onclick="handleCalcShiftBtn('C', '÷')">÷</button>
+                        <button class="btn-num" onclick="insertCalc('4')">4</button><button class="btn-num" onclick="insertCalc('5')">5</button><button class="btn-num" onclick="insertCalc('6')">6</button><button class="btn-op" onclick="handleCalcShiftBtn('P', '×')"><span class="shift-text" style="font-size:10px; color:#f1c40f; position:absolute; top:2px; left:4px;">nPr</span>×</button><button class="btn-op" onclick="handleCalcShiftBtn('C', '÷')"><span class="shift-text" style="font-size:10px; color:#f1c40f; position:absolute; top:2px; left:4px;">nCr</span>÷</button>
                     </div>
                     <div class="row-5">
                         <button class="btn-num" onclick="insertCalc('1')">1</button><button class="btn-num" onclick="insertCalc('2')">2</button><button class="btn-num" onclick="insertCalc('3')">3</button><button class="btn-op" onclick="insertCalc('+')">+</button><button class="btn-op" onclick="insertCalc('-')">-</button>
@@ -395,9 +334,7 @@
         <input type="text" id="search-box" class="search-input" list="search-history-list" placeholder="🔍 بحث عن رسالة...">
         <datalist id="search-history-list"></datalist>
 
-        <div id="drag-overlay">
-            <span style="font-size: 40px;">📁</span><span>أفلت الملفات هنا ليتم رفعها على السيرفر!</span>
-        </div>
+        <div id="drag-overlay"><span style="font-size: 40px;">📁</span><span>أفلت الملفات هنا ليتم رفعها على السيرفر!</span></div>
         
         <div id="messages-list"></div>
         
@@ -433,15 +370,19 @@
         window.msgTexts = {};
         let safePassGlobal = "";
         let currentFolderId = 'main'; 
-        let isInitialLoad = true;
         let activeUploads = {};
 
-        // Themes System
+        /* --- نظام الثيمات --- */
         const themes = [
             { name: "الافتراضي المظلم", vars: {} },
             { name: "الافتراضي المضيء", vars: { '--bg-color': '#f4f7f6', '--chat-bg': '#ffffff', '--text-dark': '#333', '--msg-bg': '#e3f2fd', '--folder-bg': '#ecf0f1', '--primary': '#4a90e2' } },
             { name: "أزرق ليلي", vars: { '--bg-color': '#0B132B', '--chat-bg': '#1C2541', '--text-dark': '#FFFFFF', '--msg-bg': '#3A506B', '--primary': '#5BC0BE', '--folder-bg': '#2E4057' } },
-            { name: "أخضر غابة", vars: { '--bg-color': '#1E2F23', '--chat-bg': '#2C4A35', '--text-dark': '#E8F5E9', '--msg-bg': '#3E6B4A', '--primary': '#4CAF50', '--folder-bg': '#385942' } }
+            { name: "أخضر غابة", vars: { '--bg-color': '#1E2F23', '--chat-bg': '#2C4A35', '--text-dark': '#E8F5E9', '--msg-bg': '#3E6B4A', '--primary': '#4CAF50', '--folder-bg': '#385942' } },
+            { name: "غروب الشمس", vars: { '--bg-color': '#2B1910', '--chat-bg': '#4A2A1A', '--text-dark': '#FFE0B2', '--msg-bg': '#6D3D22', '--primary': '#FF5722', '--folder-bg': '#5C341C' } },
+            { name: "أرجواني عميق", vars: { '--bg-color': '#1A1025', '--chat-bg': '#2D1B42', '--text-dark': '#F3E5F5', '--msg-bg': '#4A2B6B', '--primary': '#9C27B0', '--folder-bg': '#3B2356' } },
+            { name: "أحمر كرزي", vars: { '--bg-color': '#2A0808', '--chat-bg': '#4A1515', '--text-dark': '#FFEBEE', '--msg-bg': '#6B1F1F', '--primary': '#E53935', '--folder-bg': '#5A1A1A' } },
+            { name: "نسيم المحيط", vars: { '--bg-color': '#001F29', '--chat-bg': '#003647', '--text-dark': '#E0F7FA', '--msg-bg': '#00546D', '--primary': '#00BCD4', '--folder-bg': '#004359' } },
+            { name: "شاشة هاكر", vars: { '--bg-color': '#000000', '--chat-bg': '#0A0A0A', '--text-dark': '#00FF00', '--msg-bg': '#141414', '--primary': '#00CC00', '--folder-bg': '#0F0F0F' } }
         ];
 
         function initThemes() {
@@ -460,9 +401,7 @@
             const theme = themes[index];
             document.body.classList.remove('light-mode');
             document.documentElement.style.cssText = ''; 
-            if(theme.vars) {
-                for(let key in theme.vars) { document.documentElement.style.setProperty(key, theme.vars[key]); }
-            }
+            if(theme.vars) { for(let key in theme.vars) { document.documentElement.style.setProperty(key, theme.vars[key]); } }
             localStorage.setItem('selected_theme', index);
         }
 
@@ -471,9 +410,23 @@
             const savedPass = localStorage.getItem('chat_pass');
             if(savedPass) { document.getElementById('room-pass').value = savedPass; login(savedPass); }
             else { document.getElementById('login-screen').style.display = 'block'; }
+            
+            // Events for PWA file uploads
+            document.getElementById('htmlFileInput').addEventListener('change', function(e) {
+                const file = e.target.files[0]; if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(e) { document.getElementById('inputHtml').value = e.target.result; document.getElementById('htmlUploadLabel').innerHTML = '✅ تم رفع: ' + file.name; };
+                reader.readAsText(file);
+            });
+            document.getElementById('iconFileInput').addEventListener('change', function(e) {
+                const file = e.target.files[0]; if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(e) { pwaUploadedImage = e.target.result; document.getElementById('iconUploadLabel').innerHTML = '✅ تم اختيار: ' + file.name; };
+                reader.readAsDataURL(file);
+            });
         });
 
-        // Supabase Realtime & Data
+        /* --- نظام تسجيل الدخول و Supabase --- */
         function login(pass) {
             if (!pass.trim()) return alert("الرجاء كتابة كلمة المرور");
             safePassGlobal = Array.from(pass).map(c => c.charCodeAt(0).toString(16)).join('');
@@ -483,10 +436,10 @@
             document.getElementById('chat-screen').style.display = 'flex';
             document.getElementById('logout-btn').style.display = 'block';
             document.getElementById('clear-chat-btn').style.display = 'block';
+            document.getElementById('export-btn').style.display = 'block';
+            document.getElementById('import-btn').style.display = 'block';
             
-            setupRealtime();
-            loadFolders();
-            openFolder('main', 'الغرفة الرئيسية 🏠');
+            setupRealtime(); loadFolders(); openFolder('main', 'الغرفة الرئيسية 🏠');
         }
 
         document.getElementById('enter-btn').onclick = () => login(document.getElementById('room-pass').value);
@@ -497,17 +450,13 @@
                     if (payload.eventType === 'INSERT') handleNewData(payload.new);
                     if (payload.eventType === 'DELETE') handleRemoveData(payload.old);
                     if (payload.eventType === 'UPDATE') handleUpdateData(payload.new);
-                })
-                .subscribe();
+                }).subscribe();
         }
 
-        // Folder System (Using Supabase messages table with type='folder')
         async function loadFolders() {
             const { data } = await supabaseClient.from('messages').select('*').eq('room_id', safePassGlobal).eq('type', 'folder');
             document.getElementById('folders-list').innerHTML = '';
-            if (data) {
-                data.sort((a,b) => (a.pinned === b.pinned) ? 0 : a.pinned ? -1 : 1).forEach(renderFolderUI);
-            }
+            if (data) { data.sort((a,b) => (a.pinned === b.pinned) ? 0 : a.pinned ? -1 : 1).forEach(renderFolderUI); }
         }
 
         function renderFolderUI(folderData) {
@@ -517,11 +466,9 @@
             if (folderData.id == currentFolderId) div.classList.add('active-folder');
             if (folderData.pinned) { div.style.borderColor = 'var(--warning)'; div.style.borderWidth = '2px'; }
             
-            div.innerHTML = `
-                <button class="folder-btn-main" onclick="openFolder('${folderData.id}', '📁 ${escapeHtml(folderData.text)}')">📁 ${escapeHtml(folderData.text)}</button>
+            div.innerHTML = `<button class="folder-btn-main" onclick="openFolder('${folderData.id}', '📁 ${escapeHtml(folderData.text)}')">📁 ${escapeHtml(folderData.text)}</button>
                 <button class="folder-action-btn" onclick="togglePin('${folderData.id}', ${!folderData.pinned})">${folderData.pinned ? '📍' : '📌'}</button>
-                <button class="folder-action-btn" onclick="deleteRecord('${folderData.id}')">❌</button>
-            `;
+                <button class="folder-action-btn" onclick="deleteRecord('${folderData.id}')">❌</button>`;
             list.appendChild(div);
         }
 
@@ -529,7 +476,7 @@
             const name = prompt("أدخل اسم المجلد الجديد:");
             if (name && name.trim() !== "") {
                 await supabaseClient.from('messages').insert([{ type: 'folder', text: name.trim(), room_id: safePassGlobal, folder_id: 'root', pinned: false }]);
-                loadFolders(); // Refresh folders manually to sort
+                loadFolders(); 
             }
         }
 
@@ -541,9 +488,7 @@
                 const f = document.querySelector(`.folder-container[data-id="${id}"]`);
                 if(f) f.classList.add('active-folder');
                 document.getElementById('back-to-main-btn').style.display = 'inline-block';
-            } else {
-                document.getElementById('back-to-main-btn').style.display = 'none';
-            }
+            } else { document.getElementById('back-to-main-btn').style.display = 'none'; }
 
             document.getElementById('messages-list').innerHTML = '';
             const { data } = await supabaseClient.from('messages').select('*').eq('room_id', safePassGlobal).eq('folder_id', currentFolderId).neq('type', 'folder').order('id', {ascending: true});
@@ -551,72 +496,45 @@
             scrollToBottom();
         }
 
-        // Messages System
-        function handleNewData(d) {
-            if (d.type === 'folder') loadFolders();
-            else if (d.folder_id === currentFolderId) renderMessageUI(d);
-        }
-
-        function handleRemoveData(d) {
-            const el = document.getElementById('msg_' + d.id);
-            if (el) el.remove();
-            if (d.type === 'folder') loadFolders();
-        }
-
-        function handleUpdateData(d) {
-            if (d.type === 'folder') loadFolders();
-            else if (d.folder_id === currentFolderId) {
-                const el = document.getElementById('msg_' + d.id);
-                if (el) { el.remove(); renderMessageUI(d); }
-            }
-        }
+        function handleNewData(d) { if (d.type === 'folder') loadFolders(); else if (d.folder_id === currentFolderId) renderMessageUI(d); }
+        function handleRemoveData(d) { const el = document.getElementById('msg_' + d.id); if (el) el.remove(); if (d.type === 'folder') loadFolders(); }
+        function handleUpdateData(d) { if (d.type === 'folder') loadFolders(); else if (d.folder_id === currentFolderId) { const el = document.getElementById('msg_' + d.id); if (el) { el.remove(); renderMessageUI(d); } } }
 
         function renderMessageUI(d) {
             const list = document.getElementById('messages-list');
+            if(document.getElementById('msg_' + d.id)) return; // Prevent duplicates
             const div = document.createElement('div');
-            div.className = 'message-box' + (d.pinned ? ' pinned-msg' : '');
-            div.id = 'msg_' + d.id;
+            div.className = 'message-box' + (d.pinned ? ' pinned-msg' : ''); div.id = 'msg_' + d.id;
             
             if (d.type === 'text') window.msgTexts[d.id] = d.text;
             const timeStr = d.time || new Date().toLocaleTimeString('ar-EG', { hour: 'numeric', minute: '2-digit', hour12: true });
 
             let content = '';
-            if (d.type === 'text') {
-                content = `<div class="msg-text-wrapper"><div class="msg-text-content">${escapeHtml(d.text).replace(/\n/g, '<br>')}</div></div>`;
-            } else if (d.type === 'img') {
-                content = `<img src="${d.url}" class="msg-img" onclick="openLightbox('${d.url}')">`;
-            } else {
-                content = `<a href="${d.url}" target="_blank" style="color:var(--primary); font-weight:bold; text-decoration:none;">📄 ${escapeHtml(d.name || 'ملف')}</a><br><small>${d.size || ''}</small>`;
-            }
+            if (d.type === 'text') { content = `<div class="msg-text-wrapper"><div class="msg-text-content">${escapeHtml(d.text).replace(/\n/g, '<br>')}</div></div>`; } 
+            else if (d.type === 'img') { content = `<img src="${d.url}" class="msg-img" onclick="openLightbox('${d.url}')">`; } 
+            else { content = `<a href="${d.url}" target="_blank" style="color:var(--primary); font-weight:bold; text-decoration:none;">📄 ${escapeHtml(d.name || 'ملف')}</a><br><small>${d.size || ''}</small>`; }
 
-            div.innerHTML = `
-                ${d.pinned ? '<div class="pinned-badge">📌 رسالة مثبتة</div>' : ''}
-                <div class="msg-content">${content}</div>
+            div.innerHTML = `${d.pinned ? '<div class="pinned-badge">📌 رسالة مثبتة</div>' : ''}<div class="msg-content">${content}</div>
                 <div class="action-row">
                     ${d.type === 'text' ? `<button class="btn-copy" onclick="navigator.clipboard.writeText(\`${d.text.replace(/`/g, '\\`')}\`)">نسخ</button>` : ''}
                     ${d.type !== 'text' ? `<button class="btn-down" onclick="window.open('${d.url}')">تنزيل</button>` : ''}
                     <button class="btn-warning-action pin-btn" onclick="togglePin('${d.id}', ${!d.pinned})">${d.pinned ? '📍 إلغاء التثبيت' : '📌 تثبيت'}</button>
                     <button class="btn-del" onclick="deleteRecord('${d.id}')">حذف</button>
-                </div>
-                <span class="msg-time">${timeStr}</span>
-            `;
-            list.appendChild(div);
-            scrollToBottom();
+                </div><span class="msg-time">${timeStr}</span>`;
+            list.appendChild(div); scrollToBottom();
         }
 
         async function sendTextMessage() {
             const input = document.getElementById('msg-input');
             const txt = input.value.trim();
             if (txt) {
-                await supabaseClient.from('messages').insert([{
-                    type: 'text', text: txt, room_id: safePassGlobal, folder_id: currentFolderId, time: new Date().toLocaleTimeString(), pinned: false
-                }]);
+                await supabaseClient.from('messages').insert([{ type: 'text', text: txt, room_id: safePassGlobal, folder_id: currentFolderId, time: new Date().toLocaleTimeString(), pinned: false }]);
                 input.value = ""; input.style.height = '100px';
             }
         }
         document.getElementById('send-btn').onclick = sendTextMessage;
 
-        // Supabase Upload System with Progress
+        /* --- نظام الرفع (Upload) --- */
         async function handleFiles(files) {
             if (!files || files.length === 0) return;
             const progressContainer = document.getElementById('upload-progress-container');
@@ -629,12 +547,11 @@
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 const fileId = 'up_' + Date.now();
-                activeUploads[fileId] = false; // IsCancelled flag
+                activeUploads[fileId] = false; 
                 
                 progressBar.style.width = '10%'; progressText.innerText = `جاري رفع ${file.name}...`;
                 const filePath = `${safePassGlobal}/${Date.now()}_${encodeURIComponent(file.name)}`;
 
-                // Fake progress interval for UI
                 let prog = 10;
                 const progInterval = setInterval(() => {
                     if(prog < 90 && !activeUploads[fileId]) {
@@ -645,7 +562,7 @@
                 }, 500);
 
                 window.cancelUpload = () => { activeUploads[fileId] = true; clearInterval(progInterval); };
-                cancelBtn.onclick = cancelUpload;
+                cancelBtn.onclick = window.cancelUpload;
 
                 try {
                     const { data, error } = await supabaseClient.storage.from('uploads').upload(filePath, file);
@@ -653,8 +570,7 @@
                     
                     if (activeUploads[fileId]) {
                         if (data) await supabaseClient.storage.from('uploads').remove([filePath]);
-                        progressText.innerText = 'تم الإلغاء'; progressBar.style.background = 'var(--danger)';
-                        continue;
+                        progressText.innerText = 'تم الإلغاء'; progressBar.style.background = 'var(--danger)'; continue;
                     }
                     if (error) throw error;
 
@@ -678,45 +594,367 @@
 
         document.getElementById('file-upload').onchange = (e) => handleFiles(e.target.files);
 
-        // Utilities
-        async function deleteRecord(id) {
-            if (confirm('هل أنت متأكد من الحذف؟')) {
-                await supabaseClient.from('messages').delete().eq('id', id);
-            }
-        }
-
-        async function togglePin(id, state) {
-            await supabaseClient.from('messages').update({ pinned: state }).eq('id', id);
-        }
-
-        function formatBytes(bytes) {
-            if(bytes === 0) return '0 Bytes';
-            const k = 1024, sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
+        /* --- الخصائص العامة والمساعدة --- */
+        async function deleteRecord(id) { if (confirm('هل أنت متأكد من الحذف؟')) await supabaseClient.from('messages').delete().eq('id', id); }
+        async function togglePin(id, state) { await supabaseClient.from('messages').update({ pinned: state }).eq('id', id); }
+        function formatBytes(bytes) { if(bytes === 0) return '0 Bytes'; const k = 1024, sizes = ['Bytes', 'KB', 'MB', 'GB']; const i = Math.floor(Math.log(bytes) / Math.log(k)); return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]; }
         function escapeHtml(text) { return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
         function scrollToTop() { document.getElementById('messages-list').scrollTo({ top: 0, behavior: 'smooth' }); }
         function scrollToBottom() { const list = document.getElementById('messages-list'); list.scrollTo({ top: list.scrollHeight, behavior: 'smooth' }); }
         function openLightbox(url) { document.getElementById('lightbox-img').src = url; document.getElementById('lightbox').style.display = 'flex'; }
         document.getElementById('lightbox-close').onclick = () => document.getElementById('lightbox').style.display='none';
-
-        // Drag & Drop
-        const dragOverlay = document.getElementById('drag-overlay');
-        window.addEventListener('dragenter', (e) => { e.preventDefault(); if(e.dataTransfer.types.includes("Files")) dragOverlay.style.display='flex'; });
-        dragOverlay.addEventListener('dragover', (e) => e.preventDefault());
-        dragOverlay.addEventListener('dragleave', (e) => { e.preventDefault(); dragOverlay.style.display='none'; });
-        dragOverlay.addEventListener('drop', (e) => { e.preventDefault(); dragOverlay.style.display='none'; handleFiles(e.dataTransfer.files); });
-
-        // Calculator & PWA scripts (Pure JS from V10, unmodified for space)
-        function insertCalc(val) { const i = document.getElementById('calc-expression'); i.value += val; }
-        function clearCalcScreen() { document.getElementById('calc-expression').value = ''; document.getElementById('calc-result').innerText = '0'; }
-        function calculateCalcResult() { 
-            try { document.getElementById('calc-result').innerText = eval(document.getElementById('calc-expression').value); } 
-            catch { document.getElementById('calc-result').innerText = 'Error'; } 
+        
+        async function pasteIntoChat() {
+            try {
+                const text = await navigator.clipboard.readText();
+                const input = document.getElementById('msg-input');
+                input.value += text; input.focus();
+            } catch (err) { alert('⚠️ مش قادر أوصل للحافظة.'); }
         }
 
+        async function createNewTextFile() {
+            let text = document.getElementById('msg-input').value.trim();
+            if(!text) return alert("اكتب النص في صندوق الكتابة أولاً!");
+            let name = prompt("اسم الملف (بدون .txt):", "ملاحظة_جديدة");
+            if(!name) return;
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const file = new File([blob], name + '.txt', { type: 'text/plain' });
+            handleFiles([file]);
+            document.getElementById('msg-input').value = "";
+        }
+
+        async function createNewHTMLFile() {
+            let text = document.getElementById('msg-input').value.trim();
+            if(!text) return alert("اكتب الكود في صندوق الكتابة أولاً!");
+            let name = prompt("اسم الملف (بدون .html):", "index");
+            if(!name) return;
+            const blob = new Blob([text], { type: 'text/html;charset=utf-8' });
+            const file = new File([blob], name + '.html', { type: 'text/html' });
+            handleFiles([file]);
+            document.getElementById('msg-input').value = "";
+        }
+
+        function saveWholePageAsHTML() {
+            const clone = document.documentElement.cloneNode(true);
+            const chatScreen = clone.querySelector('#chat-screen'); if(chatScreen) chatScreen.style.display = 'none';
+            const loginScreen = clone.querySelector('#login-screen'); if(loginScreen) loginScreen.style.display = 'block';
+            const foldersList = clone.querySelector('#folders-list'); if(foldersList) foldersList.innerHTML = '';
+            const messagesList = clone.querySelector('#messages-list'); if(messagesList) messagesList.innerHTML = '';
+            const passInput = clone.querySelector('#room-pass'); if(passInput) passInput.value = '';
+            const msgInput = clone.querySelector('#msg-input'); if(msgInput) msgInput.value = '';
+            const htmlContent = "<!DOCTYPE html>\n" + clone.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = 'Secret_Room_Clean.html';
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        async function exportData() {
+            if (!safePassGlobal) return;
+            const btn = document.getElementById('export-btn');
+            const originalText = btn.innerText; btn.innerText = "جاري التصدير ⏳...";
+            const { data, error } = await supabaseClient.from('messages').select('*').eq('room_id', safePassGlobal);
+            if(error || !data) { btn.innerText = originalText; return alert("لا يوجد بيانات لتصديرها."); }
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = `Backup_${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+            btn.innerText = "تم التصدير ✔️"; setTimeout(() => btn.innerText = originalText, 2500);
+        }
+
+        async function importData(event) {
+            if (!safePassGlobal) return;
+            const file = event.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if(confirm("⚠️ تحذير خطير: سيتم مسح كل بيانات الغرفة الحالية واستبدالها بالبيانات المستوردة. متأكد؟")) {
+                        const btn = document.getElementById('import-btn'); btn.innerText = "جاري الاستيراد ⏳...";
+                        await supabaseClient.from('messages').delete().eq('room_id', safePassGlobal);
+                        await supabaseClient.from('messages').insert(data);
+                        alert("تم الاستيراد بنجاح!"); location.reload();
+                    }
+                } catch(err) { alert("الملف غير صالح."); }
+            };
+            reader.readAsText(file); event.target.value = ''; 
+        }
+
+        document.getElementById('clear-chat-btn').onclick = async () => {
+            if(confirm('⚠️ هل أنت متأكد من مسح محتوى الغرفة بالكامل؟')) {
+                await supabaseClient.from('messages').delete().eq('room_id', safePassGlobal);
+                document.getElementById('messages-list').innerHTML = "";
+            }
+        };
+
+        document.getElementById('logout-btn').onclick = () => { localStorage.removeItem('chat_pass'); location.reload(); };
+
+        /* --- عارض HTML --- */
+        let currentHtmlTab = null;
+        let htmlTabsData = JSON.parse(localStorage.getItem('htmlTabs') || '{}');
+
+        function initHtmlTabs() {
+            const tabsContainer = document.getElementById('html-viewer-tabs');
+            tabsContainer.innerHTML = '<button onclick="addNewHtmlTab()" style="background: var(--accent); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight:bold;">+</button>';
+            let firstTabId = null;
+            for (let tabId in htmlTabsData) {
+                if (!firstTabId) firstTabId = tabId;
+                createTabBtn(tabId, htmlTabsData[tabId].title);
+            }
+            if (!firstTabId) addNewHtmlTab('نافذة 1');
+            else switchHtmlTab(firstTabId);
+        }
+
+        function createTabBtn(tabId, title) {
+            const tabsContainer = document.getElementById('html-viewer-tabs');
+            const wrapper = document.createElement('div');
+            wrapper.className = 'html-tab-container'; wrapper.id = 'wrapper_' + tabId;
+            wrapper.innerHTML = `<button class="html-tab-btn" onclick="switchHtmlTab('${tabId}')">${title}</button>
+                                 <button class="tab-action" onclick="deleteHtmlTab('${tabId}')">❌</button>`;
+            tabsContainer.insertBefore(wrapper, tabsContainer.lastElementChild);
+        }
+
+        function addNewHtmlTab(customTitle = null) {
+            const title = customTitle || 'نافذة جديدة';
+            const tabId = 'tab_' + Date.now();
+            htmlTabsData[tabId] = { title: title, code: '', url: 'about:blank' };
+            createTabBtn(tabId, title);
+            switchHtmlTab(tabId);
+            saveTabs();
+        }
+
+        function switchHtmlTab(tabId) {
+            if (currentHtmlTab && htmlTabsData[currentHtmlTab]) {
+                htmlTabsData[currentHtmlTab].code = document.getElementById('html-viewer-input').value;
+            }
+            currentHtmlTab = tabId;
+            document.querySelectorAll('.html-tab-container').forEach(w => w.classList.remove('active-tab'));
+            const targetWrapper = document.getElementById('wrapper_' + tabId);
+            if(targetWrapper) targetWrapper.classList.add('active-tab');
+
+            const tabData = htmlTabsData[tabId] || { code: '', url: 'about:blank' };
+            document.getElementById('html-viewer-input').value = tabData.code || '';
+            if (tabData.url && tabData.url !== 'about:blank') { document.getElementById('html-viewer-iframe').src = tabData.url; } 
+            else { previewHtml(false); }
+            saveTabs();
+        }
+
+        function deleteHtmlTab(tabId) {
+            if (confirm('هل أنت متأكد من حذف هذه النافذة؟')) {
+                delete htmlTabsData[tabId];
+                document.getElementById('wrapper_' + tabId).remove();
+                if (currentHtmlTab === tabId) {
+                    currentHtmlTab = null; document.getElementById('html-viewer-input').value = ''; document.getElementById('html-viewer-iframe').src = 'about:blank';
+                }
+                saveTabs();
+            }
+        }
+
+        function saveTabs() { localStorage.setItem('htmlTabs', JSON.stringify(htmlTabsData)); }
+
+        async function pasteToHtmlViewer() {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (document.getElementById('html-viewer-input').value.trim() !== '') addNewHtmlTab('كود ملصوق');
+                document.getElementById('html-viewer-input').value = text;
+                previewHtml(true);
+            } catch (err) { alert('تعذر الوصول للحافظة.'); }
+        }
+
+        function previewHtml(save = true) {
+            const code = document.getElementById('html-viewer-input').value;
+            if (save && currentHtmlTab) { htmlTabsData[currentHtmlTab].code = code; saveTabs(); }
+            const iframe = document.getElementById('html-viewer-iframe');
+            iframe.src = 'about:blank';
+            setTimeout(() => { const doc = iframe.contentDocument || iframe.contentWindow.document; doc.open(); doc.write(code); doc.close(); }, 50);
+        }
+
+        function closeHtmlViewer() {
+            if (currentHtmlTab) { htmlTabsData[currentHtmlTab].code = document.getElementById('html-viewer-input').value; saveTabs(); }
+            document.getElementById('html-viewer-modal').style.display = 'none';
+            document.getElementById('html-viewer-iframe').src = 'about:blank';
+        }
+
+        function loadHtmlFileToViewer(event) {
+            const file = event.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                if (document.getElementById('html-viewer-input').value.trim() !== '') addNewHtmlTab(file.name);
+                document.getElementById('html-viewer-input').value = e.target.result; previewHtml(true);
+            };
+            reader.readAsText(file); event.target.value = ''; 
+        }
+
+        let isOrientationLocked = false;
+        async function toggleOrientation() {
+            const btn = document.getElementById('orientation-btn');
+            try {
+                if (!isOrientationLocked) {
+                    if (screen.orientation && screen.orientation.lock) {
+                        try { await screen.orientation.lock('portrait'); } 
+                        catch (err) { await document.documentElement.requestFullscreen(); await screen.orientation.lock('portrait'); }
+                        isOrientationLocked = true; btn.innerHTML = "🔒 قفل التدوير"; btn.style.background = "var(--danger)";
+                    }
+                } else {
+                    if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+                    if (document.fullscreenElement) await document.exitFullscreen();
+                    isOrientationLocked = false; btn.innerHTML = "🔄 تدوير الشاشة"; btn.style.background = "#34495e";
+                }
+            } catch (error) { alert("⚠️ المتصفح لا يدعم القفل المباشر."); }
+        }
+
+        /* --- صانع PWA المتقدم --- */
+        let pwaTextFiles = { 'index.html': '', 'manifest.json': '', 'sw.js': '', 'offline.html': '' };
+        let icon192Data = null; let icon512Data = null; let pwaCurrentAppName = 'PWA_App'; let pwaUploadedImage = null;
+
+        async function pastePwaCode() {
+            try { const text = await navigator.clipboard.readText(); document.getElementById('inputHtml').value = text; } 
+            catch (err) { alert('تعذر الوصول للحافظة.'); }
+        }
+
+        function createIcon(size, color, text, imageSrc) {
+            return new Promise((resolve) => {
+                const canvas = document.createElement('canvas'); canvas.width = size; canvas.height = size; const ctx = canvas.getContext('2d');
+                function drawDefault() {
+                    const gradient = ctx.createLinearGradient(0, 0, 0, size); gradient.addColorStop(0, color); gradient.addColorStop(1, '#0f172a');
+                    ctx.fillStyle = gradient; ctx.fillRect(0, 0, size, size);
+                    ctx.fillStyle = '#ffffff'; ctx.font = 'bold ' + (size * 0.45) + 'px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, size / 2, size / 2);
+                    finish();
+                }
+                function finish() { canvas.toBlob((blob) => { resolve({ blob, dataUrl: canvas.toDataURL('image/png'), base64: canvas.toDataURL('image/png').split(',')[1] }); }, 'image/png'); }
+                if (imageSrc) {
+                    const img = new Image(); img.onload = () => { ctx.drawImage(img, 0, 0, size, size); finish(); }; img.onerror = drawDefault; img.src = imageSrc;
+                } else { drawDefault(); }
+            });
+        }
+
+        async function generateAllFiles() {
+            const appName = document.getElementById('appName').value;
+            const shortName = document.getElementById('shortName').value;
+            const appDesc = document.getElementById('appDescription').value;
+            const appOri = document.getElementById('appOrientation').value;
+            const cacheVer = document.getElementById('cacheVersion').value.trim() || ('v' + Date.now());
+            const color = document.getElementById('themeColor').value;
+            const inputHtml = document.getElementById('inputHtml').value;
+            
+            pwaCurrentAppName = appName.trim() ? appName : 'PWA_App';
+            const initLetter = shortName.trim() ? shortName.trim().charAt(0).toUpperCase() : 'A';
+
+            icon192Data = await createIcon(192, color, initLetter, pwaUploadedImage);
+            icon512Data = await createIcon(512, color, initLetter, pwaUploadedImage);
+            
+            document.getElementById('icon192Preview').src = icon192Data.dataUrl;
+            document.getElementById('icon512Preview').src = icon512Data.dataUrl;
+
+            pwaTextFiles['manifest.json'] = JSON.stringify({
+                name: appName, short_name: shortName, description: appDesc, start_url: `./index.html?v=${cacheVer}`, display: "standalone", orientation: appOri, background_color: "#ffffff", theme_color: color,
+                icons: [ { src: `./icon-192.png?v=${cacheVer}`, sizes: "192x192", type: "image/png", purpose: "any maskable" }, { src: `./icon-512.png?v=${cacheVer}`, sizes: "512x512", type: "image/png", purpose: "any maskable" } ]
+            }, null, 2);
+
+            pwaTextFiles['offline.html'] = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>لا يوجد اتصال</title><style>body { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: system-ui; background-color: ${color}; color: white; }</style></head><body><h1>📶 أنت غير متصل بالإنترنت</h1><button onclick="window.location.reload()" style="padding:10px 20px; font-weight:bold; cursor:pointer;">تحديث</button></body></html>`;
+
+            pwaTextFiles['sw.js'] = `const CACHE_NAME = 'pwa-cache-${cacheVer}';
+            const urlsToCache = [ './', './index.html?v=${cacheVer}', './offline.html?v=${cacheVer}', './icon-192.png?v=${cacheVer}', './icon-512.png?v=${cacheVer}', './manifest.json?v=${cacheVer}' ];
+            self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))); self.skipWaiting(); });
+            self.addEventListener('activate', event => { event.waitUntil(caches.keys().then(cacheNames => Promise.all(cacheNames.map(name => { if(name !== CACHE_NAME) return caches.delete(name); })))); self.clients.claim(); });
+            self.addEventListener('fetch', event => { event.respondWith(caches.match(event.request).then(response => response || fetch(event.request).catch(() => { if(event.request.mode === 'navigate') return caches.match('./offline.html?v=${cacheVer}'); }))); });`;
+
+            const pwaTags = `<meta http-equiv="Cache-Control" content="no-cache"><link rel="manifest" href="./manifest.json?v=${cacheVer}"><meta name="theme-color" content="${color}"><link rel="apple-touch-icon" href="./icon-192.png?v=${cacheVer}"><script>if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js?v=${cacheVer}'); }); }<\/script>\n`;
+            
+            const sourceHtml = inputHtml.trim() ? inputHtml : `<!DOCTYPE html><html><head><title>${appName}</title></head><body><h1>مرحباً بك</h1></body></html>`;
+            pwaTextFiles['index.html'] = /(<\/head>)/i.test(sourceHtml) ? sourceHtml.replace(/(<\/head>)/i, pwaTags + '$1') : pwaTags + '\n' + sourceHtml;
+
+            document.getElementById('resultsCard').style.display = 'block';
+        }
+
+        function downloadAsZip() {
+            if (!window.JSZip) return alert('مكتبة الضغط غير محملة.');
+            const zip = new JSZip();
+            const folderName = pwaCurrentAppName.replace(/[^a-zA-Z0-9_\-\u0600-\u06FF\s]/g, '').trim().replace(/\s+/g, '_') || 'PWA_Files';
+            const folder = zip.folder(folderName);
+            folder.file("index.html", pwaTextFiles['index.html']); folder.file("manifest.json", pwaTextFiles['manifest.json']);
+            folder.file("sw.js", pwaTextFiles['sw.js']); folder.file("offline.html", pwaTextFiles['offline.html']); 
+            folder.file("icon-192.png", icon192Data.base64, {base64: true}); folder.file("icon-512.png", icon512Data.base64, {base64: true});
+            zip.generateAsync({type:"blob"}).then(function(content) { downloadBlob(folderName + ".zip", content); });
+        }
+
+        function downloadBlob(filename, blob) {
+            const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = filename;
+            document.body.appendChild(a); a.click(); setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 150);
+        }
+
+        /* --- الآلة الحاسبة --- */
+        const calcExprInput = document.getElementById('calc-expression');
+        const calcResultDiv = document.getElementById('calc-result');
+        let calcLastAnswer = "0"; let isCalcShifted = false; let isCalcAlpha = false; 
+        let calcMemory = { A: 0, B: 0, X: 0, Y: 0, M: 0 };
+
+        function calcFact(n) { if (n < 0 || n % 1 !== 0) return NaN; if (n === 0 || n === 1) return 1; let result = 1; for (let i = 2; i <= n; i++) result *= i; return result; }
+        function calcNPr(n, r) { return calcFact(n) / calcFact(n - r); }
+        function calcNCr(n, r) { return calcFact(n) / (calcFact(r) * calcFact(n - r)); }
+        function calcSinD(x) { return Math.sin(x * Math.PI / 180); } 
+        function calcCosD(x) { return Math.cos(x * Math.PI / 180); } 
+        function calcTanD(x) { return Math.tan(x * Math.PI / 180); }
+        function calcAsinD(x) { return Math.asin(x) * 180 / Math.PI; } 
+        function calcAcosD(x) { return Math.acos(x) * 180 / Math.PI; } 
+        function calcAtanD(x) { return Math.atan(x) * 180 / Math.PI; }
+
+        function toggleCalcShift() { isCalcShifted = !isCalcShifted; isCalcAlpha = false; updateCalcIndicators(); }
+        function toggleCalcAlpha() { isCalcAlpha = !isCalcAlpha; isCalcShifted = false; updateCalcIndicators(); }
+
+        function updateCalcIndicators() {
+            document.getElementById('calc-shift-indicator').style.opacity = isCalcShifted ? '1' : '0.2'; 
+            document.getElementById('calc-alpha-indicator').style.opacity = isCalcAlpha ? '1' : '0.2';
+            document.getElementById('btn-calc-sin').innerHTML = isCalcShifted ? 'sin⁻¹' : 'sin'; 
+            document.getElementById('btn-calc-cos').innerHTML = isCalcShifted ? 'cos⁻¹' : 'cos'; 
+            document.getElementById('btn-calc-tan').innerHTML = isCalcShifted ? 'tan⁻¹' : 'tan';
+        }
+
+        function insertCalcTrig(type) { insertCalc(isCalcShifted ? type + '^-1(' : type + '('); if(isCalcShifted) toggleCalcShift(); }
+        function handleCalcAlphaBtn(alphaVal, normalVal) { insertCalc(isCalcAlpha ? alphaVal : normalVal); if(isCalcAlpha) toggleCalcAlpha(); }
+        function handleCalcShiftBtn(shiftVal, normalVal) { insertCalc(isCalcShifted ? shiftVal : normalVal); if(isCalcShifted) toggleCalcShift(); }
+
+        function insertCalc(value) {
+            let start = calcExprInput.selectionStart; let text = calcExprInput.value;
+            calcExprInput.value = text.substring(0, start) + value + text.substring(start);
+            calcExprInput.selectionStart = calcExprInput.selectionEnd = start + value.length; calcExprInput.scrollLeft = calcExprInput.scrollWidth;
+        }
+
+        function moveCalcCursor(dir) {
+            let pos = calcExprInput.selectionStart;
+            if (dir === 'left' && pos > 0) pos--; if (dir === 'right' && pos < calcExprInput.value.length) pos++;
+            if (dir === 'up') pos = 0; if (dir === 'down') pos = calcExprInput.value.length; 
+            calcExprInput.selectionStart = calcExprInput.selectionEnd = pos; 
+        }
+
+        function deleteCalcAtCursor() {
+            let start = calcExprInput.selectionStart; if (start === 0) return; 
+            let text = calcExprInput.value;
+            calcExprInput.value = text.substring(0, start - 1) + text.substring(start);
+            calcExprInput.selectionStart = calcExprInput.selectionEnd = start - 1; 
+        }
+
+        function clearCalcScreen() { calcExprInput.value = ""; calcResultDiv.innerText = "0"; if(isCalcShifted) toggleCalcShift(); if(isCalcAlpha) toggleCalcAlpha(); }
+
+        function calculateCalcResult() {
+            let expr = calcExprInput.value; if (expr === "") return;
+            expr = expr.replace(/×/g, '*').replace(/÷/g, '/');
+            expr = expr.replace(/(\d+)\(/g, '$1*(').replace(/(\d+)([ABXYM])/g, '$1*$2').replace(/\)\(/g, ')*(').replace(/([ABXYM])\(/g, '$1*(').replace(/([ABXYM])([ABXYM])/g, '$1*$2');
+            expr = expr.replace(/A/g, `(${calcMemory.A})`).replace(/B/g, `(${calcMemory.B})`).replace(/X/g, `(${calcMemory.X})`).replace(/Y/g, `(${calcMemory.Y})`).replace(/M/g, `(${calcMemory.M})`);
+            expr = expr.replace(/(\d+)!/g, 'calcFact($1)').replace(/(\d+)P(\d+)/g, 'calcNPr($1,$2)').replace(/(\d+)C(\d+)/g, 'calcNCr($1,$2)');
+            let mathString = expr.replace(/pi/g, 'Math.PI').replace(/Ans/g, calcLastAnswer).replace(/\^/g, '**').replace(/sin\^-1\(/g, 'calcAsinD(').replace(/cos\^-1\(/g, 'calcAcosD(').replace(/tan\^-1\(/g, 'calcAtanD(').replace(/sin\(/g, 'calcSinD(').replace(/cos\(/g, 'calcCosD(').replace(/tan\(/g, 'calcTanD(').replace(/log\(/g, 'Math.log10(').replace(/ln\(/g, 'Math.log(').replace(/sqrt\(/g, 'Math.sqrt(').replace(/abs\(/g, 'Math.abs(');
+            try {
+                let result = eval(mathString); if (result % 1 !== 0) result = parseFloat(result.toFixed(8));
+                calcResultDiv.innerText = result; calcLastAnswer = result; calcExprInput.selectionStart = calcExprInput.selectionEnd = calcExprInput.value.length;
+            } catch (error) { calcResultDiv.innerText = 'Syntax ERROR'; }
+        }
+
+        function toggleCalcTheme() {
+            const calc = document.querySelector('.calculator'); const btn = document.getElementById('calc-theme-btn');
+            if (calc.getAttribute('data-theme') === 'dark') { calc.setAttribute('data-theme', 'light'); btn.innerHTML = 'Dark Mode 🌙'; } 
+            else { calc.setAttribute('data-theme', 'dark'); btn.innerHTML = 'Light Mode ☀️'; }
+        }
     </script>
 </body>
 </html>
+i
