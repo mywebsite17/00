@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=0.2">
     <title>منصة الملفات والمحادثة الخاصة</title>
-    <!-- استدعاء مكتبة Supabase و JSZip -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
@@ -30,7 +29,7 @@
         
         #logout-btn { right: 20px; background: var(--danger); display: none; }
         #clear-chat-btn { right: 120px; background: var(--warning); display: none; }
-        #share-link-btn { right: 260px; background: var(--accent); display: none; } /* زر مشاركة الرابط */
+        #share-link-btn { right: 260px; background: var(--accent); display: none; } 
         
         #login-screen { background: var(--chat-bg); border-radius: 12px; padding: 24px; width: 95%; max-width: 600px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); box-sizing: border-box; }
         #chat-screen { background: var(--chat-bg); border-radius: 12px; padding: 24px; width: 98%; max-width: 1400px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); box-sizing: border-box; height: 95vh; display: none; flex-direction: column; position: relative; }
@@ -396,6 +395,26 @@
             }).catch(err => alert("مشكلة في نسخ الرابط."));
         }
 
+        /* --- التحميل الإجباري للملفات (عشان متفتحش في صفحة تانية) --- */
+        async function forceDownload(url, filename) {
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error();
+                const blob = await res.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = filename || 'download';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(blobUrl);
+            } catch (e) {
+                // لو المتصفح منع الـ fetch (بسبب الـ CORS مثلاً)، يفتحها في صفحة جديدة كحل بديل
+                window.open(url, '_blank');
+            }
+        }
+
         /* --- نظام الثيمات --- */
         const themes = [
             { name: "الافتراضي المظلم", vars: {} },
@@ -432,7 +451,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             initThemes();
             
-            // قراءة الرابط لو فيه باسورد ومجلد مبعوتين
             const urlParams = new URLSearchParams(window.location.search);
             const sharedPass = urlParams.get('pass');
             const sharedFolder = urlParams.get('f');
@@ -467,7 +485,6 @@
         function login(pass, folderToOpen = 'main') {
             if (!pass.trim()) return alert("الرجاء كتابة كلمة المرور");
             
-            // التحقق من الباسورد للمستخدم الواحد
             if (pass !== MASTER_PASSWORD) {
                 alert("❌ كلمة المرور خاطئة! غير مصرح لك بالدخول.");
                 return;
@@ -478,7 +495,6 @@
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('chat-screen').style.display = 'flex';
             
-            // إظهار الزراير
             document.getElementById('logout-btn').style.display = 'block';
             document.getElementById('clear-chat-btn').style.display = 'block';
             document.getElementById('share-link-btn').style.display = 'block';
@@ -554,7 +570,7 @@
 
         function renderMessageUI(d) {
             const list = document.getElementById('messages-list');
-            if(document.getElementById('msg_' + d.id)) return; // Prevent duplicates
+            if(document.getElementById('msg_' + d.id)) return; 
             const div = document.createElement('div');
             div.className = 'message-box' + (d.pinned ? ' pinned-msg' : ''); div.id = 'msg_' + d.id;
             
@@ -564,12 +580,15 @@
             let content = '';
             if (d.type === 'text') { content = `<div class="msg-text-wrapper"><div class="msg-text-content">${escapeHtml(d.text).replace(/\n/g, '<br>')}</div></div>`; } 
             else if (d.type === 'img') { content = `<img src="${d.url}" class="msg-img" onclick="openLightbox('${d.url}')">`; } 
-            else { content = `<a href="${d.url}" target="_blank" style="color:var(--primary); font-weight:bold; text-decoration:none;">📄 ${escapeHtml(d.name || 'ملف')}</a><br><small>${d.size || ''}</small>`; }
+            else { 
+                // هنا استخدمنا زرار بيستدعي التنزيل الإجباري باستخدام data attributes
+                content = `<a href="${d.url}" target="_blank" style="color:var(--primary); font-weight:bold; text-decoration:none;">📄 ${escapeHtml(d.name || 'ملف')}</a><br><small>${d.size || ''}</small>`; 
+            }
 
             div.innerHTML = `${d.pinned ? '<div class="pinned-badge">📌 رسالة مثبتة</div>' : ''}<div class="msg-content">${content}</div>
                 <div class="action-row">
                     ${d.type === 'text' ? `<button class="btn-copy" onclick="navigator.clipboard.writeText(\`${d.text.replace(/`/g, '\\`')}\`)">نسخ</button>` : ''}
-                    ${d.type !== 'text' ? `<button class="btn-down" onclick="window.open('${d.url}', '_blank')">تنزيل</button>` : ''}
+                    ${d.type !== 'text' ? `<button class="btn-down" data-url="${d.url}" data-name="${escapeHtml(d.name)}" onclick="forceDownload(this.dataset.url, this.dataset.name)">تنزيل</button>` : ''}
                     <button class="btn-warning-action pin-btn" onclick="togglePin('${d.id}', ${!d.pinned})">${d.pinned ? '📍 إلغاء التثبيت' : '📌 تثبيت'}</button>
                     <button class="btn-del" onclick="deleteRecord('${d.id}')">حذف</button>
                 </div><span class="msg-time">${timeStr}</span>`;
@@ -603,7 +622,7 @@
                 
                 progressBar.style.width = '10%'; progressText.innerText = `جاري رفع ${file.name}...`;
                 
-                // استبدال المسافات والرموز المعقدة عشان الروابط متتكسرش
+                // تنظيف اسم الملف من أي مسافات أو رموز تسبب أخطاء في الروابط
                 const safeName = file.name.replace(/[^a-zA-Z0-9.\-_\u0600-\u06FF]/g, '_');
                 const filePath = `admin_room/${Date.now()}_${safeName}`;
 
@@ -649,10 +668,9 @@
 
         document.getElementById('file-upload').onchange = (e) => handleFiles(e.target.files);
 
-        /* --- الحذف والتثبيت (تم التعديل لتجنب أخطاء RLS في واجهة المستخدم) --- */
+        /* --- الحذف والتثبيت --- */
         async function deleteRecord(id, isFolder = false) { 
             if (confirm('هل أنت متأكد من الحذف نهائياً؟')) {
-                // إزالة مبدئية من الشاشة قبل انتظار الرد من السيرفر (Optimistic UI)
                 if (!isFolder) { document.getElementById('msg_' + id)?.remove(); } 
                 else { document.querySelector(`.folder-container[data-id="${id}"]`)?.remove(); }
                 
@@ -669,7 +687,6 @@
             const { error } = await supabaseClient.from('messages').update({ pinned: state }).eq('id', id);
             if (error) alert("⚠️ فشل التثبيت! تأكد من تشغيل كود الـ SQL في Supabase.\n" + error.message);
             else {
-                // تحديث الشاشة لو التحديث اللحظي مجاش
                 const msg = document.getElementById('msg_' + id);
                 if (msg) {
                     if(state) msg.classList.add('pinned-msg'); else msg.classList.remove('pinned-msg');
