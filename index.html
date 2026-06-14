@@ -155,9 +155,9 @@
     </div>
 
     <script>
-        // إعدادات مشروعك الحقيقية
         const SUPABASE_URL = 'https://pyqnnwtrrwnfitveeetw.supabase.co'; 
-        const SUPABASE_KEY = 'EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5cW5ud3RycnduZml0dmVlZXR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0MjY2NjMsImV4cCI6MjA5NzAwMjY2M30.-OqBWXSsGvkRdZfAaM-xaiR80-Wh_r_AAvQbtikFhGI';
+        // تم تصحيح حرف الـ e ليكون صغير (lowercase) كما يجب أن يكون في JWT
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5cW5ud3RycnduZml0dmVlZXR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0MjY2NjMsImV4cCI6MjA5NzAwMjY2M30.-OqBWXSsGvkRdZfAaM-xaiR80-Wh_r_AAvQbtikFhGI';
 
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
