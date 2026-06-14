@@ -155,27 +155,25 @@
     </div>
 
     <script>
+        // إعدادات مشروعك الحقيقية
         const SUPABASE_URL = 'https://pyqnnwtrrwnfitveeetw.supabase.co'; 
-        const SUPABASE_KEY = 'Sb_publishable_rO1xhC-CnqiumB0cRkvvGQ_youWGnKn';
+        const SUPABASE_KEY = 'EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5cW5ud3RycnduZml0dmVlZXR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0MjY2NjMsImV4cCI6MjA5NzAwMjY2M30.-OqBWXSsGvkRdZfAaM-xaiR80-Wh_r_AAvQbtikFhGI';
 
-        // إنشاء اتصال بقاعدة البيانات
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
         const notificationSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
         const chatContainer = document.getElementById('chatContainer');
         window.cancelUploadTasks = {};
 
-        // جلب الرسائل القديمة
+        // جلب الرسائل من قاعدة البيانات
         async function fetchMessages() {
             const { data, error } = await supabaseClient.from('messages').select('*').order('id', { ascending: true });
-            if (error) console.error("خطأ في جلب الرسائل:", error);
+            if (error) console.error("خطأ:", error);
             if (data) data.forEach(renderMessage);
         }
-        
-        // تشغيل الجلب بمجرد فتح الصفحة
         fetchMessages();
 
-        // الاستماع المباشر (Realtime)
+        // تفعيل البث المباشر
         supabaseClient.channel('public-messages-channel')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
                 renderMessage(payload.new);
@@ -192,10 +190,9 @@
             
             const timeStr = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
             
-            // إرسال الرسالة لقاعدة البيانات
             const { error } = await supabaseClient.from('messages').insert([{ type: 'text', text: input.value, time: timeStr }]);
             if (error) {
-                alert("حدث خطأ في الإرسال، تأكد من اتصالك.");
+                alert("حدث خطأ في الإرسال. تأكد من اتصالك.");
                 console.error(error);
                 return;
             }
@@ -344,7 +341,7 @@
         function copyShareLink() {
             const link = window.location.href;
             if (link.includes("file:///")) {
-                alert("أنت تفتح الملف من الكمبيوتر مباشرة.\nلعمل رابط حقيقي، قم برفع هذا الملف على Netlify أولاً كما شرحنا.");
+                alert("أنت تفتح الملف من الكمبيوتر مباشرة.\nلعمل رابط حقيقي، قم برفع هذا الملف على سيرفر أولاً.");
             } else {
                 navigator.clipboard.writeText(link).then(() => {
                     alert("✅ تم نسخ رابط الغرفة بنجاح!\n\n" + link);
